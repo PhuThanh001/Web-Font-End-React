@@ -2,9 +2,9 @@ import { Row } from "antd";
 import styled from "styled-components";
 
 export const WrapperHeader = styled.div`
-  width: 100%;
+  width: 1270%;
   background-color:rgb(14, 63, 136);
-  padding: 16px;
+  padding: 10px 0 ;
   align-items : center;
   gap : 16px ;
   flex-wrap : nowrap;

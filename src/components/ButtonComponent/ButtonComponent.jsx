@@ -5,13 +5,11 @@ const ButtonComponent = ({size , styleButton , styleTextButton , textButton, ...
   return (
     <Button 
                     size = {size} 
-                    //icon = {<SearchOutlined color={colorButton} style={{ color :'#fff' } } />}
-                    style ={{styleButton : styleButton}}
+                    style ={ styleButton}
                     {...rests}
                     > 
                     <span style={styleTextButton} >{textButton}</span>  
                     </Button>
   )
-}
-
+} 
 export default ButtonComponent

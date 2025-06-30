@@ -11,7 +11,8 @@ import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
 // ✅ Component
 const HeaderComponent = () => {
   return (
-      <WrapperHeader>
+    <div style={{width : '100%' ,background : 'rgb(26,148,255)' ,display : 'flex' ,justifyContent : 'center' }}>
+              <WrapperHeader>
           <Row align="middle">
               <Col span={6}>
                   <WrapperTextHeader>Laptrinhquade</WrapperTextHeader>
@@ -23,7 +24,7 @@ const HeaderComponent = () => {
                       size = "large"
                   />
               </Col>
-              <Col span={6} style={{ display : 'flex' , gap : '30px'}} >
+              <Col span={6} style={{ display : 'flex' , gap : '30px' ,alignItems : 'center'}} >
               <WrapperHeaderAccount>
                 <UserOutlined style={{ fontSize : '30px'  }} />
               <div>
@@ -48,6 +49,8 @@ const HeaderComponent = () => {
               </Col>
           </Row>
       </WrapperHeader>
+    </div>  
+
   )
 }
 export default HeaderComponent
