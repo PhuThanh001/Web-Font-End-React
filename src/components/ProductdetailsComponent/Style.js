@@ -22,7 +22,7 @@ export const WrapperStyleNameProduct = styled.h1`
 export const WrapperStyleTextSell = styled.span`
         font-size :  15px;
         line-height : 24px;
-        background : rgb(120 ,120,120);
+        background : rgb(247, 242, 242);
 `
 export const WrapperPriceProduct = styled.div`
         background : rgb(250,250,250 );
@@ -54,21 +54,21 @@ export const WrapperAddressProduct = styled.div`
             flex-shrink : 0;
         }
 `
-export const WrapperQualityTextProduct = styled.div`
+export const WrapperQualityProduct = styled.div`
         display : flex;
-        gap : 4px;
+        gap : 10px;
         align-items : center;
         boder-radius : 4px ;
         border  : 1px solid #ccc ;
         width : 100px
 `
-export const WrapperBtnProduct = styled.span`
-        border : 1
-`
 export const WrapperInputNumber = styled(InputNumber)`
-        &.ant-Input-number.ant-input-number-sm{
+        &.ant-Input-number.ant-input-number-sm{         
             width : 40px;
             border-top : none;
             border-bottom : none;
+            &ant-input-number-handle-wrap {
+                display : none !important;
+            }
         }
 `
