@@ -2,10 +2,19 @@ import {BrowserRouter as Router,Routes,Route } from 'react-router-dom'
 import HeaderComponent from './components/HeaderComponent/HeaderComponet'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import { routes } from './routes'
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import LayoutWithHeader from './components/Layout/LayoutWithHeader'; // <-- dùng layout mới
+import axios from 'axios';
 
- function App() {
+function App() {
+  useEffect(() => {
+    fetchApi();
+  }, []);
+console.log('VITE_API_URL', import.meta.env.VITE_API_URL);
+const fetchApi = async () => {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll`);
+  console.log('res', res);
+};
   return (
     <div style={{ width: '100%' }}>
       <Routes>

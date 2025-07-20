@@ -9,14 +9,19 @@ import reportWebVitals from './reportWebVitals.js' ;
 import {Provider} from 'react-redux';
 import { store } from './redux/store.js';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const queryclient = new QueryClient()
+
 root.render(
-    <React.StrictMode>
+  <QueryClientProvider client={queryclient}>
     <Provider store={store}>
         <BrowserRouter>
         <App />
       </BrowserRouter>
     </Provider>
-    </React.StrictMode>
+  </QueryClientProvider>
 )
 reportWebVitals();

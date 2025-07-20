@@ -5,33 +5,63 @@ import InputForm from '../../components/InputForm/InputForm'
 import imagelogo from '../../assets/image/Imagelogo.png'
 import { Image } from 'antd'
 import { WrapperTextLight } from './style'
+import { useNavigate } from 'react-router-dom';
+import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 
 const SignInPage = () => {
+  const [isShowPassword, setIsShowPassword] = React.useState(true); // Example variable to control password visibility
+  const [Email, setEmail] = React.useState(''); // State to hold the email value
+  const [password, setPassword] = React.useState('');
+  const navigate = useNavigate();
+  const handlerNavigationSignUp = () => {
+    navigate('/signup'); // Navigate to the SignUp page
+  }
+    const handleOnChangeEmail = (value) => {
+    setEmail(value);
+  };
+  const handleOnChangePassword = (value) => {
+    setPassword(value);
+  };
   return (
       <div style={{ display : 'flex' , alignItems : 'center' , justifyContent : 'center', background: 'rgb(0,0,0,0.53 )', height :'100vh' }}>
             <div style={{ height : '445px' , width : '800px' , borderRadius : '6px' , background : '#fff' , display : 'flex' }}>
         <WrapperContainerLeft>
-            <h1> Xin chào</h1>
-            <p> đăng nhập vào tạo tài khoản </p>
-            <InputForm style ={{ marginBottom : '10px' , }} placeholder = "abc@gmail.com"/>
-            <InputForm  placeholder= "password"/>
+            <h1>Xin chào</h1>
+            <p>đăng nhập vào tạo tài khoản</p>
+            <InputForm style ={{ marginBottom : '10px' , }} placeholder = "abc@gmail.com" value={Email} onChange={handleOnChangeEmail}/>
+            <div style={{ position: 'relative' }}>
+            <span
+              onClick={() => setIsShowPassword(!isShowPassword)}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '10px',
+                zIndex: 10
+              }}>
+              {isShowPassword ? (
+                <EyeFilled />
+              ) : (
+                <EyeInvisibleFilled />
+              )}
+            </span>            
+            <InputForm  placeholder= "password"  type={isShowPassword ? 'text' : 'password'} value={password} onChange={handleOnChangePassword}/>
+          </div>
             <ButtonComponent
-            border={false}
+            disabled={!Email.length || !password.length}
             size={40}
             styleButton={{
-              backgroundColor: 'rgb(224, 1, 16)',
+              backgroundColor: 'rgba(236, 58, 3, 1)',
               height: '48px',
               width: '100%  ',
               border: 'none',
               borderRadius: '4px' ,
               margin : '26px 0 10px'
-
             }}
             textButton={'Đăng nhập'}
             styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }} >
             </ButtonComponent>
             <p><WrapperTextLight>Quên mật khẩu</WrapperTextLight></p>
-            <p> chưa có tài khoản <WrapperTextLight> Tạo tài khoản </WrapperTextLight>  </p>
+            <p>Chưa có tài khoản<WrapperTextLight onClick={handlerNavigationSignUp}>Đăng ký</WrapperTextLight></p>
         </WrapperContainerLeft>
         <WrapperContainerRight>
             <Image src = {imagelogo} preview = {false} alt = "image-logo" height = "203px" width ="203px" />
