@@ -11,6 +11,7 @@ import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import * as UserService from '../../service/UserService';
 import { useMutationHook } from '../../hooks/useMutationHook';
+import Loading from '../../components/LoadingComponent/loading'
 
 const SignInPage = () => {
   const [isShowPassword, setIsShowPassword] = React.useState(true); // Example variable to control password visibility
@@ -23,7 +24,8 @@ const SignInPage = () => {
   const mutation = useMutationHook(
     data  => UserService.loginUser(data)
     )
-    console.log('mutation', mutation)
+    const {data, isPending} = mutation;
+    console.log("ispending:", isPending);
     const handleOnChangeEmail = (value) => {
     setEmail(value);
   };
@@ -32,7 +34,8 @@ const SignInPage = () => {
   };
   const handleSignIn = () => {
     mutation.mutate({ Email, password });
-  }
+    
+  }  
   return (
       <div style={{ display : 'flex' , alignItems : 'center' , justifyContent : 'center', background: 'rgb(0,0,0,0.53 )', height :'100vh' }}>
             <div style={{ height : '445px' , width : '800px' , borderRadius : '6px' , background : '#fff' , display : 'flex' }}>
@@ -57,6 +60,8 @@ const SignInPage = () => {
             </span>
             <InputForm placeholder="password" type={isShowPassword ? 'text' : 'password'} value={password} onChange={handleOnChangePassword} />
           </div>
+            {data?.status === 'ERR' && <span style={{color : 'red'}} > {data?.message} </span>}
+            <Loading isPending={isPending} >
             <ButtonComponent
             disabled={!Email.length || !password.length}
             onClick={handleSignIn}
@@ -72,6 +77,7 @@ const SignInPage = () => {
             textButton={'Đăng nhập'}
             styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }} >
             </ButtonComponent>
+            </Loading>
             <p><WrapperTextLight>Quên mật khẩu</WrapperTextLight></p>
             <p>Chưa có tài khoản<WrapperTextLight onClick={handlerNavigationSignUp}>Đăng ký</WrapperTextLight></p>
         </WrapperContainerLeft>
