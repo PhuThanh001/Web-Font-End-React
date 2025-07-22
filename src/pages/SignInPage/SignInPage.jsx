@@ -1,40 +1,63 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { WrapperContainerLeft, WrapperContainerRight } from './style'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import InputForm from '../../components/InputForm/InputForm'
 import imagelogo from '../../assets/image/Imagelogo.png'
-import { Image } from 'antd'
+import { Image, message } from 'antd'
 import { WrapperTextLight } from './style'
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import * as UserService from '../../service/UserService';
+import * as Message from '../../components/InputForm/InputForm'
 import { useMutationHook } from '../../hooks/useMutationHook';
-import Loading from '../../components/LoadingComponent/loading'
+import Loading from '../../components/LoadingComponent/loading';
+import {jwtDecode} from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../../redux/slides/userSilde';
 
 const SignInPage = () => {
   const [isShowPassword, setIsShowPassword] = React.useState(true); // Example variable to control password visibility
-  const [Email, setEmail] = React.useState(''); // State to hold the email value
+  const [email, setEmail] = React.useState(''); // State to hold the email value
   const [password, setPassword] = React.useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handlerNavigationSignUp = () => {
     navigate('/signup'); // Navigate to the SignUp page
   }
   const mutation = useMutationHook(
     data  => UserService.loginUser(data)
     )
-    const {data, isPending} = mutation;
-    console.log("ispending:", isPending);
-    const handleOnChangeEmail = (value) => {
+    console.log('mutation:', mutation);
+    const {data, isPending ,isSuccess} = mutation;
+    useEffect(() => {
+    if (isSuccess) {
+      navigate('/');
+      localStorage.setItem('access_token', data?.access_token);
+      if (data?.access_token) {
+        const decodedToken = jwtDecode(data?.access_token);
+        console.log('decode:', decodedToken);
+        if(decodedToken?.id){
+           handleGetDetailsUser(decodedToken?.id, data?.access_token);
+        }
+      }
+    }
+  }, [isSuccess]);
+  const handleGetDetailsUser = async (id , token) => {
+      const res =  await UserService.getUserDetails(id, token);
+      console.log('res:', res);
+      dispatch(updateUser({ ...res?.data, access_token: token }));
+  }
+  const handleOnChangeEmail = (value) => {
     setEmail(value);
-  };
+  }
   const handleOnChangePassword = (value) => {
     setPassword(value);
   };
   const handleSignIn = () => {
-    mutation.mutate({ Email, password });
-    
+    mutation.mutate({ email, password });
   }  
   return (
       <div style={{ display : 'flex' , alignItems : 'center' , justifyContent : 'center', background: 'rgb(0,0,0,0.53 )', height :'100vh' }}>
@@ -42,7 +65,7 @@ const SignInPage = () => {
         <WrapperContainerLeft>
             <h1>Xin chào</h1>
             <p>đăng nhập vào tạo tài khoản</p>
-            <InputForm style ={{ marginBottom : '10px' , }} placeholder = "abc@gmail.com" value={Email} onChange={handleOnChangeEmail}/>
+            <InputForm style ={{ marginBottom : '10px' , }} placeholder = "abc@gmail.com" value={email} onChange={handleOnChangeEmail}/>
             <div style={{ position: 'relative' }}>
             <span
               onClick={() => setIsShowPassword(!isShowPassword)}
@@ -63,7 +86,7 @@ const SignInPage = () => {
             {data?.status === 'ERR' && <span style={{color : 'red'}} > {data?.message} </span>}
             <Loading isPending={isPending} >
             <ButtonComponent
-            disabled={!Email.length || !password.length}
+            disabled={!email.length || !password.length}
             onClick={handleSignIn}
             size={40}
             styleButton={{
@@ -91,5 +114,4 @@ const SignInPage = () => {
       </div>
   )
 }
-
 export default SignInPage

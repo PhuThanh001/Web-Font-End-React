@@ -9,12 +9,15 @@ import {
 } from '@ant-design/icons';
 import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 // ✅ Component
 const HeaderComponent = () => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
   const handlerNavigationLogin = () => {
     navigate('/sign-in'); // Navigate to the SignIn page
   }
+  console.log('user:', user);
   return (
     <div style={{width : '100%' ,background : 'rgb(26,148,255)' ,display : 'flex' ,justifyContent : 'center' }}>
               <WrapperHeader>
@@ -32,7 +35,14 @@ const HeaderComponent = () => {
               <Col span={6} style={{ display : 'flex' , gap : '30px' ,alignItems : 'center'}} >
               <WrapperHeaderAccount>
                 <UserOutlined style={{ fontSize : '30px'  }} />
-              <div onClick={handlerNavigationLogin} style={{cursor : 'pointer' , display : 'flex' , flexDirection : 'column' , alignItems : 'center'}}>
+                { user?.name ? (
+                  <div style={{cursor : 'pointer' , display : 'flex' , flexDirection : 'column' , alignItems : 'center'}}>
+                    <WrapperTextHeaderSmall>
+                      {user?.name}
+                    </WrapperTextHeaderSmall>
+                  </div>
+                ) : (
+                  <div onClick={handlerNavigationLogin} style={{cursor : 'pointer' , display : 'flex' , flexDirection : 'column' , alignItems : 'center'}}>
                   <WrapperTextHeaderSmall>
                       Đăng ký/Đăng nhập
                   </WrapperTextHeaderSmall>
@@ -43,6 +53,8 @@ const HeaderComponent = () => {
                       <CaretDownOutlined />
                   </div>
               </div>
+                )}
+              
               </WrapperHeaderAccount>
               <div>
               <div>

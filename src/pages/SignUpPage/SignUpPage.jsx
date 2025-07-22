@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { WrapperContainerLeft, WrapperContainerRight } from './style'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import InputForm from '../../components/InputForm/InputForm'
@@ -9,6 +9,7 @@ import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as UserService from '../../service/UserService';
+import * as message from '../../components/Message/message';
 import Loading from '../../components/LoadingComponent/loading'
 
 const SignUpPage = () => {
@@ -24,8 +25,19 @@ const SignUpPage = () => {
   const mutation = useMutationHook(
     data => UserService.registerUser(data) // Assuming you have a registerUser function in UserService
   );
+
   console.log('mutation:', mutation);
-  const { data, isPending } = mutation;
+  const { data, isPending , isError , isSuccess } = mutation;
+      
+  useEffect(() => {
+        if (isSuccess) {
+          message.success()
+          handleNavigateSignIn()
+        } else if (isError) {
+            message.error();
+          }
+      }, [isSuccess, isError])
+
   const handleOnChangeEmail = (value) => {
     setEmail(value);
   };
@@ -35,6 +47,9 @@ const SignUpPage = () => {
   const handleOnChangeConfirmPassword = (value) => {
     setConfirmPassword(value);
   };
+    const handleNavigateSignIn = () => {
+    navigate('/signin'); // Navigate to the SignIn page
+  }
   const handleSignUp = () => {
     // Handle sign-up logic here
     mutation.mutate({ email, password, confirmPassword });
