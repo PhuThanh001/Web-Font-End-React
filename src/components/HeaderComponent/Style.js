@@ -30,3 +30,10 @@ export const WrapperIconHeader = styled.span`
     font-size : 30px;
     color : #fff;
 `
+export const WrapperContentPopUp = styled.p`
+    cursor: pointer;
+    &:hover {
+        background : rgb(26,148,255);
+        color: #fff;
+
+    }`

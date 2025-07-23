@@ -35,7 +35,7 @@ const SignInPage = () => {
     useEffect(() => {
     if (isSuccess) {
       navigate('/');
-      localStorage.setItem('access_token', data?.access_token);
+      localStorage.setItem('access_token', JSON.stringify(data?.access_token));
       if (data?.access_token) {
         const decodedToken = jwtDecode(data?.access_token);
         console.log('decode:', decodedToken);
@@ -45,7 +45,8 @@ const SignInPage = () => {
       }
     }
   }, [isSuccess]);
-  const handleGetDetailsUser = async (id , token) => {
+  
+const handleGetDetailsUser = async (id , token) => {
       const res =  await UserService.getUserDetails(id, token);
       console.log('res:', res);
       dispatch(updateUser({ ...res?.data, access_token: token }));
