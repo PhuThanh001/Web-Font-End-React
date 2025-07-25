@@ -9,7 +9,8 @@ import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as UserService from '../../service/UserService';
-import * as message from '../../components/Message/message';
+import * as message from '../../components/Message/Message';
+import { success ,error } from '../../components/Message/Message'
 import Loading from '../../components/LoadingComponent/loading'
 
 const SignUpPage = () => {
@@ -31,10 +32,10 @@ const SignUpPage = () => {
       
   useEffect(() => {
         if (isSuccess) {
-          message.success()
+          success()
           handleNavigateSignIn()
         } else if (isError) {
-            message.error();
+            error();
           }
       }, [isSuccess, isError])
 

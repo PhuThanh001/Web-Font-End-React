@@ -1,14 +1,15 @@
-import {message} from 'antd';
+import { message } from 'antd';
 
 const success = (mes = 'Success') => {
-    message.warning(mes);
+    message.success(mes); // ✅ đúng loại
 };
 
 const error = (mes = 'Error') => {
-    message.warning(mes);
+    message.error(mes); // ✅ đúng loại
 };
 
 const warning = (mes = 'Warning') => {
-    message.warning(mes);
-}
+    message.warning(mes); // ✅ đúng loại
+};
+
 export { success, error, warning };

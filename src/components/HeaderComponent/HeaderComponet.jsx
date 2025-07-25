@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Badge, Col, Row, Popover } from 'antd';
 import { WrapperHeader,WrapperHeaderAccount,WrapperTextHeader,WrapperTextHeaderSmall,WrapperIconHeader ,WrapperContentPopUp} from './Style';
 import Search  from 'antd/es/transfer/search';
@@ -17,14 +17,23 @@ import Loading from '../LoadingComponent/loading';
 const HeaderComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [userName , setUserName] = useState();
+  const [userAvatar , setUserAvatar] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state) => state.user);
   
   const handleLogout = async () => {
+    setIsLoading(true);
     await UserService.logoutUser(); // Call the logout service
     dispatch(resetUser()); // Reset user state in Redux
     setIsLoading(false); // Set loading state to false
   };
+  useEffect(() => {
+    setIsLoading(true);
+    setUserName(user?.name);
+    setUserAvatar(user?.avatar)
+    setIsLoading(false);
+  }, [user?.name , user?.avatar]);
 const content = (
   <div>
     <WrapperContentPopUp onClick={handleLogout}>Đăng Xuất</WrapperContentPopUp>
@@ -33,7 +42,7 @@ const content = (
 );
 
   const handlerNavigationLogin = () => {
-    navigate('/sign-in'); // Navigate to the SignIn page
+    navigate('/signin'); // Navigate to the SignIn page
   }
   console.log('user:', user);
   return (
@@ -53,12 +62,25 @@ const content = (
               <Col span={6} style={{ display : 'flex' , gap : '30px' ,alignItems : 'center'}} >
               <Loading isPending={isLoading}>
               <WrapperHeaderAccount>
+              {userAvatar ? 
+              (
+                <img src={userAvatar} style={
+                {
+                    height: '30px' ,
+                    width:  '30px',
+                    borderRadius:  '50%',
+                    objectFit :  'cover'
+                }} alt ="avatar" /> 
+              ) :(
                 <UserOutlined style={{ fontSize : '30px'  }} />
-                { user?.name ? (
+              )
+            }
+                
+                { user?.access_token ? (
                   <> 
                   <Popover trigger = "click" content={content}>
                     <div style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {user?.name}
+                    {userName.length ? userName : user?.email }
                   </div>
                   </Popover> 
                     </>          
