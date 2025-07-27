@@ -9,7 +9,8 @@ import {StarFilled} from '@ant-design/icons'
 import logo from '../../assets/image/logo.jpg';
 
 
-const CardComponent = () => {
+const CardComponent = (props) => {
+  const {countInStock ,description , image ,name ,rating, price ,type,discount , selled  } = props
   return (
   <Card 
     hoverable
@@ -21,17 +22,17 @@ const CardComponent = () => {
       style = {{width : '68px' , height : '14px' ,position : 'absolute' , top: -1 ,left : -1,
       borderTopLeftRadius :'3px'}}
       />
-      <StyleNameProduct>Iphone</StyleNameProduct>
+      <StyleNameProduct>{name}</StyleNameProduct>
       <WrapperReportText >
         <span style={{marginRight : '4px'}} >        
-          <span> 4.96 </span> <StarFilled style={{fontSize : '12px', color : 'yellow' }} />
-          <span>|đã bán 1000k </span>
+          <span> {rating} </span> <StarFilled style={{fontSize : '12px', color : 'yellow' }} />
+          <span>|đã bán {selled || 1000} k+ </span>
         </span>
                </WrapperReportText>  
         <WrapperPriceText> 
-            1.000.000 $ 
+            {price}
         <WrapperDiscountText>
-           -5%
+            {discount || -5} % 
         </WrapperDiscountText>
         </WrapperPriceText>
   </Card>
