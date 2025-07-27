@@ -2,26 +2,30 @@ import {BrowserRouter as Router,Routes,Route } from 'react-router-dom'
 import HeaderComponent from './components/HeaderComponent/HeaderComponet'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import { routes } from './routes'
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import LayoutWithHeader from './components/Layout/LayoutWithHeader'; // <-- dùng layout mới
 import axios from 'axios';
 import  {isjsonstring}  from './utils';
 import { jwtDecode } from 'jwt-decode'
 import * as UserService from './service/UserService';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from './redux/slides/userSilde';
 import { error } from './components/Message/message'
-
+import 'antd/dist/reset.css'; // Với Antd v5
+import Loading from './components/LoadingComponent/loading'
 
 function App() {
   const dispatch = useDispatch();
+  const [isLoading , setIsLoading] = useState(false)
+  const user = useSelector((state)  => state.user)
   useEffect(() => {
+      setIsLoading(true)
       const { storageData ,decoded } = handleDecoded();
       if(decoded?.id){
         handleGetDetailsUser(decoded?.id , storageData);
       }
+      setIsLoading(false)
   },[]);
-
   const handleDecoded = () => {
     let storageData = localStorage.getItem('access_token');
     console.log('storageData:', storageData);
@@ -49,26 +53,32 @@ function App() {
     dispatch(updateUser({ ...res?.data, access_token: token }));
   }
   return (
-    <div style={{ width: '100%' }}>
-      <Routes>
-        {routes.map((route) => {
-          const Page = route.page;
-          const Layout = route.isShowHeader ? LayoutWithHeader : Fragment;   
-          return (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <Layout>
-                  <Page />
-                </Layout>
-              }
-            />
-          );
-        })}
-      </Routes>
-    </div>
-  );
+      <div style={{ width: '100%' }}>
+      <Loading isPending={isLoading}>
+          <Routes>
+          {routes.map((route) => {
+            const Page = route.page;
+            const isCheckAuth = !route.isPrivate || user.isAdmin;
+            const Layout = route.isShowHeader ? LayoutWithHeader : Fragment;
+
+            // Chỉ render Route nếu isCheckAuth là true
+            return isCheckAuth ? (
+              <Route
+                key={route.path}
+                path={route.path} // Sử dụng trực tiếp route.path
+                element={
+                  <Layout>
+                    <Page />
+                  </Layout>
+                }
+              />
+            ) : null; // Bỏ qua Route nếu isCheckAuth là false
+          })}
+        </Routes>
+      </Loading>
+
+      </div>
+    );
 }
 
 export default App;

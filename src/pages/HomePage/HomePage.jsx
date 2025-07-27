@@ -9,9 +9,24 @@ import CardComponent from '../../components/CardComponent/CardComponent';
 import NavbarComponent from '../../components/NavbarComponent/NavbarComponent';
 import { WrapperButtonMore } from './style';
 import { WrapperProducts } from '../../components/TypeProduct/Style';
+import { useQuery } from '@tanstack/react-query';
+import * as ProductService from '../../service/ProductService';
+import { retry } from '@reduxjs/toolkit/query';
 
 const HomePage = () => {
             const arr = ['TV ','Tu lanh ', 'Lap top']
+            const fetchProductAll = async () => {
+                const res = await ProductService.GetAllProduct() 
+                console.log('res' ,res)
+                return res
+            }
+            const { isLoading, data:products } = useQuery({
+            queryKey: ['products'],
+            queryFn: fetchProductAll,
+            retry: 3,
+            retryDelay: 1000
+            });            
+            console.log('data' , products)
     return (
         <> 
         <div style={{padding: '0 120px' ,margin : '0 auto' , width : '1270px' }}>     
@@ -28,13 +43,22 @@ const HomePage = () => {
             <div id ="container"  style ={{backgroundColor : '#efefef',padding : '0 120px',height : '1000px' }}>
             <SliderComponent arrImages={[slider1 , slider2, slider3]} />
             <WrapperProducts style={{marginTop: '20px' ,display :'flex' ,  alignItems : 'center' ,justifyContent : 'space-around', gap : '20px' ,flexWrap : 'wrap'}} >
-                <CardComponent/>
-                <CardComponent/>
-                <CardComponent/>
-                <CardComponent/>
-                <CardComponent/>
-                <CardComponent/>
-                <CardComponent/>
+                {products?.data?.data?.map((product) => {
+                    return (
+                    <CardComponent key={product._id} 
+                    CountInStock={product.CountInStock} 
+                    description={product.description} 
+                    image={product.image}
+                    name ={product.name}
+                    price ={product.price}
+                    rating ={product.rating}
+                    type ={product.type}
+                    selled= {product.selled}
+                    discount ={product.discount} />
+                    )
+                })}
+                
+                
             </WrapperProducts>            
                  <div style={{ width: '100%' ,display: 'flex' , justifyContent: 'center' ,marginTop : '10px'}}>
                     <WrapperButtonMore textButton="Xem Thêm" type="outline" styleButton={{
