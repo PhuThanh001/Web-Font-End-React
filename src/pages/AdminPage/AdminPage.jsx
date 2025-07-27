@@ -3,56 +3,24 @@ import  { useState } from 'react'
 import { AppstoreOutlined, MailOutlined, ProductOutlined, SettingOutlined, UserOutlined  } from '@ant-design/icons';
 import { Menu } from 'antd';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponet';
+import AdminProduct from '../../components/AdminProduct/AdminProduct';
+import AdminUser from '../../components/AdminUser/AdminUser';
 const AdminPage = () => {
   const items = [
   {
-    key: '1',
+    key: 'user',
     icon: <UserOutlined />,
     label: 'Người dùng ',
-    children: [
-      { key: '11', label: 'Option 1' },
-      { key: '12', label: 'Option 2' },
-      { key: '13', label: 'Option 3' },
-      { key: '14', label: 'Option 4' },
-    ],
   },
   {
-    key: '2',
+    key: 'product',
     icon: <ProductOutlined />,
     label: 'Sản Phẩm',
-    children: [
-      { key: '21', label: 'Option 1' },
-      { key: '22', label: 'Option 2' },
-      {
-        key: '23',
-        label: 'Submenu',
-        children: [
-          { key: '231', label: 'Option 1' },
-          { key: '232', label: 'Option 2' },
-          { key: '233', label: 'Option 3' },
-        ],
-      },
-      {
-        key: '24',
-        label: 'Submenu 2',
-        children: [
-          { key: '241', label: 'Option 1' },
-          { key: '242', label: 'Option 2' },
-          { key: '243', label: 'Option 3' },
-        ],
-      },
-    ],
   },
   {
     key: '3',
     icon: <SettingOutlined />,
     label: 'Navigation Three',
-    children: [
-      { key: '31', label: 'Option 1' },
-      { key: '32', label: 'Option 2' },
-      { key: '33', label: 'Option 3' },
-      { key: '34', label: 'Option 4' },
-    ],
   },
 ];
 const getLevelKeys = items1 => {
@@ -92,6 +60,20 @@ const getLevelKeys = items1 => {
     }
   };
   const [keyselected, setKeyselected] = useState(' ');
+  const RenderPage = (key) => {
+    switch(key) {
+      case 'user':
+      return (
+          <AdminUser/>
+      );
+      case 'product':
+        return (
+          <AdminProduct/>
+        )
+      default:
+        <></>
+    }
+  }
   const handleOnClick = ({ key}) => {
       setKeyselected(key);
       console.log({ key})
@@ -105,17 +87,17 @@ const getLevelKeys = items1 => {
       defaultSelectedKeys={['231']}
       openKeys={stateOpenKeys}
       onOpenChange={onOpenChange}
-      style={{ width: 256 }}
+      style={{ width: 256,
+      boxShadow : '1px 1px 2px #ccc'
+      ,height: '100vh' }}
       items={items}
       onClick={handleOnClick}
     />
-    <div style={{flex : 1 }}>
-        {keyselected === '6' && <span>Key la 6</span>}
-        <span>test</span>
+    <div style={{flex : 1, padding: '15px'}}>
+        {RenderPage(keyselected)}
     </div>
     </div>
     </>
   )
 }
-
 export default AdminPage
