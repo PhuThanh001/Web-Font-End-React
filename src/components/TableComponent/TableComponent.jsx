@@ -3,28 +3,28 @@ import React from 'react'
 import Loading from '../LoadingComponent/loading';
 
 const TableComponent = (props) => {
-    const {selectionType = 'checkbox' ,data = [] ,isLoading = false, columns = []} = props
- // rowSelection object indicates the need for row selection
+    const { selectionType = 'checkbox', data = [], isLoading = false, columns = [], onRow } = props;
+
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
         },
-        getCheckboxProps: record => ({
-            disabled: record.name === 'Disabled User', // Column configuration not to be checked
+        getCheckboxProps: (record) => ({
+            disabled: record.name === 'Disabled User',
             name: record.name,
         }),
     };
-  return (
-    <Loading>
+
+    return (
         <Table
-        rowSelection={Object.assign({ type: selectionType }, rowSelection)}
-        columns={columns}
-        dataSource={data}
-        {...props}
+            rowSelection={{ type: selectionType, ...rowSelection }}
+            columns={columns}
+            dataSource={data}
+            loading={isLoading}
+            onRow={onRow} 
         />
-    </Loading>
-      
-  )
+    )
 }
+
 
 export default TableComponent

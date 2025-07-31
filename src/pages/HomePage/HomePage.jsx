@@ -57,8 +57,6 @@ const HomePage = () => {
                     discount ={product.discount} />
                     )
                 })}
-                
-                
             </WrapperProducts>            
                  <div style={{ width: '100%' ,display: 'flex' , justifyContent: 'center' ,marginTop : '10px'}}>
                     <WrapperButtonMore textButton="Xem Thêm" type="outline" styleButton={{

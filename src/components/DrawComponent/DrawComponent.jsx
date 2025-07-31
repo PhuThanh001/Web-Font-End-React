@@ -1,7 +1,10 @@
 import React from 'react'
+import {Drawer } from 'antd'
+
 
 const DrawComponent = ({title = 'Drawer', placement = 'right',isopen = false,children, ...rests   }) => {
- <>
+  return(
+  <>
       <Drawer
         title={title}
         placement={placement}
@@ -11,6 +14,6 @@ const DrawComponent = ({title = 'Drawer', placement = 'right',isopen = false,chi
       {children}
       </Drawer>
     </>
+    )
 }
-
 export default DrawComponent

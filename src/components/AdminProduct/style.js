@@ -7,7 +7,7 @@ export const WrapperHeader = styled.h1`
 
 `
 export const WrapperUpLoadFile = styled(Upload)`
-    & .ant-upload.ant-upload-select.ant-upload-select-picture-card {
+    & .ant-upload-list-item.ant-upload-list-item-undefined {
         width: 60px;
         height: 60px;
         border-radius: 50%

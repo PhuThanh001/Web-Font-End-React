@@ -15,10 +15,10 @@ import { resetUser } from '../../redux/slides/userSilde';
 import Loading from '../LoadingComponent/loading';
 // ✅ Component
 const HeaderComponent = ({isHiddenSearch = false ,isHiddentCart = false}) => {
-  const navigate = useNavigate();
+  const Navigate = useNavigate();
   const dispatch = useDispatch();
-  const [userName , setUserName] = useState();
-  const [userAvatar , setUserAvatar] = useState();
+  const [userName , setUserName] = useState('');
+  const [userAvatar , setUserAvatar] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state) => state.user);
   
@@ -34,18 +34,26 @@ const HeaderComponent = ({isHiddenSearch = false ,isHiddentCart = false}) => {
     setUserAvatar(user?.avatar)
     setIsLoading(false);
   }, [user?.name , user?.avatar]);
+  console.log('username', userName)
 const content = (
   <div>
-   
-    <WrapperContentPopUp onClick={() => Navigate('/Profile-User')}>Thông tin người dùng </WrapperContentPopUp>
-    {user?.isAdmin &&   
-    ( <WrapperContentPopUp onClick={() => Navigate('/system/Admin ')}>Quản lí hệ thống </WrapperContentPopUp>
+    <WrapperContentPopUp onClick={() => Navigate('/Profile-User')}>
+      Thông tin người dùng
+    </WrapperContentPopUp>
+
+    {user?.isAdmin && (
+      <WrapperContentPopUp onClick={() => Navigate('/System/Admin')}>
+        Quản lí hệ thống
+      </WrapperContentPopUp>
     )}
-       <WrapperContentPopUp onClick={handleLogout}>Đăng Xuất</WrapperContentPopUp>
-    </div>
+
+    <WrapperContentPopUp onClick={handleLogout}>
+      Đăng Xuất
+    </WrapperContentPopUp>
+  </div>
 );
   const handlerNavigationLogin = () => {
-    navigate('/signin'); // Navigate to the SignIn page
+    Navigate('/signin'); // Navigate to the SignIn page
   }
   console.log('user:', user);
   return (
@@ -84,7 +92,7 @@ const content = (
                   <> 
                   <Popover trigger = "click" content={content} >
                     <div style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {userName.length ? userName : user?.email }
+                    {userName?.length ? userName : user?.email }
                   </div>
                   </Popover> 
                     </>          

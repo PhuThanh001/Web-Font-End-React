@@ -7,11 +7,11 @@ export const GetAllProduct = async () => {
     return res.data;
 }
 export const CreateProduct  = async (data) => {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/product/create`,data);
+    const res = await axios.post('/api/product/create', data);
     return res.data;
 }
 export const GetDetailsProduct  = async (id) => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/get-details/${id}`);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getProductDetails/${id}`);
     return res.data;
 }
 export const UpdateProduct  = async (id ,access_token,data) => {
