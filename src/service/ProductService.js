@@ -23,3 +23,12 @@ export const UpdateProduct  = async (id ,access_token,data) => {
     console.log('res.data' ,res.data)
     return res.data;
 }
+export const DeleteProduct  = async (id ,access_token) => {
+    const res = await axiosJWT.delete(`${import.meta.env.VITE_API_URL}/product/delete/${id}`, {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    });
+    console.log('res.data' ,res.data)
+    return res.data;
+}

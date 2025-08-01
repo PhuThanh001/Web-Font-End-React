@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useRef, useState } from 'react'
 import {useQuery} from '@tanstack/react-query'
 import TableComponent from '../TableComponent/TableComponent'
-import { Descriptions, Table ,Modal } from 'antd';
+import { Descriptions, Table ,Modal, Space  } from 'antd';
 import { WrapperHeader ,WrapperUpLoadFile  } from './style';
-import {DeleteOutlined, PlusCircleFilled,EditOutlined} from '@ant-design/icons'
-import {Button ,App,Form } from 'antd'
+import {DeleteOutlined, PlusCircleFilled,EditOutlined , SearchOutlined} from '@ant-design/icons'
+import {Button ,App,Form  } from 'antd'
 import { useSelector } from 'react-redux';
 import Input from 'antd/es/input/Input';
 import InputComponent from '../InputComponent/InputComponent'
@@ -14,6 +14,8 @@ import * as ProductService  from '../../service/ProductService';
 import Loading from '../LoadingComponent/loading';
 import DrawComponent from '../DrawComponent/DrawComponent';
 import imageCompression from 'browser-image-compression';
+import ModalComponent from '../ModalComponent/ModalComponent';
+import Highlighter from 'react-highlight-words';
 
 
 const AdminProduct = () => {
@@ -22,8 +24,12 @@ const AdminProduct = () => {
   const [rowSelected , SetRowSelected] = useState('')
   const [isOpenDraw, SetIsOpenDraw] = useState(false)
   const [isLoadingUpdate , SetIsLoadingUpdate] = useState(false)
+  const [isModalOpenDelete , SetIsModalOpenDelete] = useState(false)
   const user = useSelector((state) => state?.user)
   const [form] = Form.useForm();
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
 
   const [stateProduct , setStateProduct] = useState({
     name: '',
@@ -74,10 +80,21 @@ const AdminProduct = () => {
     const res = await ProductService.UpdateProduct(
       id,
       token,
-      rests
-    )
+      {...rests})
     return res
-  })
+  },
+)
+  const mutationDelete = useMutationHook(async (data) => {
+    const {
+      id ,
+      token
+    } = data
+    const res = await ProductService.DeleteProduct(
+      id,
+      token)
+    return res
+  },
+)
     const getAllProducts = async () => {
     const res = await ProductService.GetAllProduct()
     console.log('product ', res)
@@ -119,30 +136,155 @@ const AdminProduct = () => {
     console.log('rowSelected' , rowSelected)
     SetIsOpenDraw(true)
   }  
+  const handleDeleteProduct = () => {
+    mutationDelete.mutate({id:  rowSelected , token: user?.access_token}),{
+      onSettled: () => {
+        queryProduct.refetch()
+      }
+    }
+  }
   const { data, isPending , isError , isSuccess } = mutation
   const { data:dataUpdate, isPending:isPendingUpdate , isError:isErrorUpdate , isSuccess:isSuccessUpdate } = mutationUpdate
+  const { data:dataDelete, isPending:isPendingDelete , isError:isErrorDelete , isSuccess:isSuccessDelete } = mutationDelete
 
+  const queryProduct = useQuery({ queryKey: ['products'], queryFn: getAllProducts });
   const {isLoading: isLoadingProduct , data: products} = useQuery({queryKey: ['products'] , queryFn: getAllProducts})
+
   const renderAction = () => {
     return (
       <div>
-          <DeleteOutlined style={{color : 'red' , fontSize: '30px', cursor:'pointer'}}/>
+          <DeleteOutlined style={{color : 'red' , fontSize: '30px', cursor:'pointer'}} onClick={() => SetIsModalOpenDelete(true)}/>
           <EditOutlined style={{color: 'orange' , fontSize:'30px' , cursor:'pointer' }} onClick={handleDetailsProduct}/>
       </div>
     )
   }
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    // setSearchText(selectedKeys[0]);
+    // setSearchedColumn(dataIndex);
+  };
+  const handleReset = clearFilters => {
+    clearFilters();
+    //setSearchText('');
+  };
+const getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({ closeDropdown: false });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    filterDropdownProps: {
+      onOpenChange(open) {
+        if (open) {
+          setTimeout(() => {
+            var _a;
+            return (_a = searchInput.current) === null || _a === void 0 ? void 0 : _a.select();
+          }, 100);
+        }
+      },
+    },
+    render: text =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
+  });
   const columns = [
         {
             title: 'name',
             dataIndex: 'name',
+            render: (test) => <a>{test}</a>, 
+            sorter: (a,b) => a.name.length - b.name.length,
+            ...getColumnSearchProps('name')
         },
         {
-            title: 'price',
-            dataIndex: 'price',
+          title: 'price',
+          dataIndex: 'price',
+          sorter: (a, b) => a.price - b.price,
+          filters: [
+            {
+              text: '>= 50',
+              value: '=>',
+            },
+            {
+              text: '<= 50',
+              value: '<=',
+            },
+          ],
+          onFilter: (value, record) => {
+            console.log('value' , {value, record})
+            if(value === '>='){
+            return record.price >= 50
+          } 
+            return record.price <= 50
+        },
         },
         {
             title: 'rating',
             dataIndex: 'rating',
+            sorter: (a , b ) => a.price - b.price,
+            filters: [
+            {
+              text: '>= 3',
+              value: '=>',
+            },
+            {
+              text: '<= 3',
+              value: '<=',
+            },
+          ],
+          onFilter: (value, record) => {
+            console.log('value' , {value, record})
+            if(value === '>='){
+            return Number(record.rating) >= 3
+          } 
+            return Number(record.rating) <= 3
+        },
         },   
         {
             title: 'Type',
@@ -161,16 +303,23 @@ const AdminProduct = () => {
     useEffect(() => {
       console.log('isSuccess:', isSuccess, 'isError:', isError);
       if (isSuccess && data?.status ==='ok') {
-        console.log('Trước khi gọi messageApi.success');
         messageApi.success('Cập nhật thành công!');
         handleCloseDrawer()
-        console.log('Sau khi gọi messageApi.success');
       } else if (isError) {
-        console.log('Trước khi gọi messageApi.error');
         messageApi.error('Cập nhật thất bại!');
-        console.log('Sau khi gọi messageApi.error');
       }
     }, [isSuccess, isError, messageApi]);
+
+    useEffect(() => {
+      console.log('isSuccess:', isSuccessDelete, 'isError:', isErrorDelete);
+      if (isSuccessDelete && data?.status ==='ok') {
+        messageApi.success('Xóa thành công!');
+        handleCloseDrawer()
+      } else if (isError) {
+        messageApi.error('Cập nhật thất bại!');
+      }
+    }, [isSuccess, isError, messageApi]);
+
     const handleCloseDrawer = () => {
     SetIsOpenDraw(false);
     setStateProduct({
@@ -185,6 +334,9 @@ const AdminProduct = () => {
     form.resetField()
   }
   const [avatar, setAvatar] = useState('');
+  const  handleCancelDelete = () => {
+    SetIsModalOpenDelete(false)
+  }
   const handleCancel = () => {
     setIsModelOpen(false);
     setStateProduct({
@@ -199,7 +351,11 @@ const AdminProduct = () => {
     form.resetField()
   }
   const onFinish = () => {
-    mutation.mutate(stateProduct)  
+    mutation.mutate(stateProduct,
+      {onSettled: () => {
+            queryProduct.refetch()
+      }
+  })
   }
 
   const handleOnChange = (e) => {
@@ -219,7 +375,11 @@ const AdminProduct = () => {
   console.log('rowsellll' , rowSelected)
   console.log('stateproduccc' , stateProductDetails)
   const OnUpdateProduct = () => {
-      mutationUpdate.mutate({id: rowSelected , token : user?.access_token , ...stateProductDetails})
+      mutationUpdate.mutate({id: rowSelected , token : user?.access_token , ...stateProductDetails} , 
+        {onSettled: () => {
+            queryProduct.refetch()
+      }
+  })
   }
   // const handleOnchangeAvatar = async (uploadData) => {
   //   console.log('🔥 uploadData:', uploadData);
@@ -329,7 +489,6 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
         onClick: event => {
           SetRowSelected(record._id)
           console.log("Clicked row id: ", record._id);
-
         }
       }
     }} />
@@ -506,6 +665,16 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
           </Form.Item>
         </Form></Loading>
       </DrawComponent>
+      <ModalComponent
+        title="Xóa Sản Phẩm"
+        closable={{'aria-label': 'Custom Close Button' }}
+        open={isModalOpenDelete}
+        onCancel={handleCancelDelete}
+        onOk={handleDeleteProduct}
+        okButtonProps={{display : 'none'}}
+      >
+      <div>bạn có chắc muốn xóa sản phẩm này không ?</div>
+      </ModalComponent>
     </div>
   )
 };
