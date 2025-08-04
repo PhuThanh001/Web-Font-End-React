@@ -12,13 +12,29 @@ export const registerUser = async (data) => {
     console.log('registerUser function called with data:', data);
     return res.data;
 }
-export const getUserDetails = async (id, token) => {
-    const res = await axiosJWT.get(`${import.meta.env.VITE_API_URL}/user/get-details/${id}`, {
+export const getAllUser = async (access_token) => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/getAll`, {
         headers: {
-            token: `Bearer ${token}`
+            token: `Bearer ${access_token}`
         }
     });
-    console.log('getUserDetails function called with token:', token);
+    return res.data;
+}
+export const DeleteUser = async (id , access_token ) => {
+    const res = await axios.delete(`${import.meta.env.VITE_API_URL}/user/delete-user/${id}` , {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    });
+    return res.data;
+}
+export const getUserDetails = async (id, access_token) => {
+    const res = await axiosJWT.get(`${import.meta.env.VITE_API_URL}/user/get-details/${id}`, {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    });
+    console.log('getUserDetails function called with token:', access_token);
     return res.data;
 }
 export const refreshToken = async () => {
