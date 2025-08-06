@@ -14,6 +14,7 @@ import { getBase64 } from '../../utils';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as UserService  from '../../service/UserService';
 import imageCompression from 'browser-image-compression';
+import { Excel } from 'antd-table-saveas-excel';
 
 
 
@@ -86,14 +87,17 @@ const AdminUser = () => {
     console.log('product ', res)
     return res
   }
+  //nếu hàm không được gọi thì console.log() không được thực thi
   const fetchGetDetailsUser = async () =>{
     const res = await UserService.getUserDetails(rowSelected)
-    if(res?.data){
+  console.log('🟢 API Response:', res);
+  console.log('🔵 res.data:', res?.data);    
+  if(res?.data){
       setStateUserDetails({
-        name: res?.data.name,
-        email: res?.data.email,
-        phone: res?.data.phone,
-        isAdmin: res?.data.isAdmin,
+        name: res?.data.data.name,
+        email: res?.data.data.email,
+        phone: res?.data.data.phone,
+        isAdmin: res?.data.data.isAdmin,
       })
     }
     SetIsLoadingUpdate(false)
@@ -102,7 +106,7 @@ const AdminUser = () => {
   useEffect(() => {
     form.setFieldsValue(stateUserDetails)
   }, [form , stateUserDetails] )
-  
+  //sửa lỗi dòng này là phải click vô ô vuông chứ không nó không gọi được hàm fetchGetDetailsUser
   useEffect(() => 
     {
       if(rowSelected) {
@@ -271,7 +275,6 @@ const getColumnSearchProps = dataIndex => ({
         messageApi.error('Cập nhật thất bại!');
       }
     }, [isSuccessUpdate, isErrorUpdate, messageApi]);
-
     useEffect(() => {
       console.log('isSuccess:', isSuccessDelete, 'isError:', isErrorDelete);
       if (isSuccessDelete && dataDelete?.status ==='ok') {
@@ -281,7 +284,6 @@ const getColumnSearchProps = dataIndex => ({
         messageApi.error('Cập nhật thất bại!');
       }
     }, [isSuccessDelete, isErrorDelete, messageApi]);
-
     const handleCloseDrawer = () => {
     SetIsOpenDraw(false);
     setStateUser({
@@ -375,8 +377,7 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
     console.error('Lỗi khi nén hoặc chuyển file sang base64:', error);
   }
 };
-
-  return (
+return (
     <div>
       <WrapperHeader>Quản lý người dùng</WrapperHeader>
       <div style={{ marginTop: '10px' }}>
@@ -498,7 +499,7 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
               name="email"
               rules={[{ required: true, message: 'Please input your Type!' }]}
             >
-              <InputComponent value={stateUserDetails.type} onChange={handleOnChangeDetails} name="type" />
+              <InputComponent value={stateUserDetails.type} onChange={handleOnChangeDetails} name="email" />
             </Form.Item>
             <Form.Item
               label="Phone"
@@ -507,16 +508,16 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
             >
               <InputComponent value={stateUserDetails.phone} onChange={handleOnChangeDetails} name="phone" />
             </Form.Item>
-            {/* <Form.Item
+          <Form.Item
               label="Image"
               name="image"
               rules={[{ required: true, message: 'Please input your Image!' }]}
             >
-              <WrapperUpLoadFile onChange={handleOnchangeAvatarDetails} maxCount={1} beforeUpload={() => false}>
+              <WrapperUpLoadFile onChange={handleOnchangeAvatar} maxCount={1} beforeUpload={() => false}>
                 <Button>Select File</Button>
-                {stateUserDetails?.image && (
+                {stateUser?.avatar && (
                   <img
-                    src={stateUserDetails?.image}
+                    src={stateUserDetails?.avatar}
                     style={{
                       height: '60px',
                       width: '60px',
@@ -528,7 +529,7 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
                   />
                 )}
               </WrapperUpLoadFile>
-            </Form.Item> */}
+            </Form.Item>
             <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
               <Button type="primary" htmlType="submit">
                 Apply

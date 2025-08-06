@@ -95,6 +95,18 @@ const AdminProduct = () => {
     return res
   },
 )
+  const mutationDeleteMany = useMutationHook(async (data) => {
+    const {
+      token,
+      ...ids
+    } = data
+    const res = await ProductService.Delete_many_product(
+      token,
+      ids,
+)
+    return res
+  },
+)
     const getAllProducts = async () => {
     const res = await ProductService.GetAllProduct()
     console.log('product ', res)
@@ -143,9 +155,19 @@ const AdminProduct = () => {
       }
     }
   }
+  const handleDeleteManyProduct = (ids) => {
+    console.log('token' , user)
+    mutationDeleteMany.mutate({id:  ids , token: user?.access_token}),{
+      onSettled: () => {
+        queryProduct.refetch()
+      }
+    }
+  }
   const { data, isPending , isError , isSuccess } = mutation
   const { data:dataUpdate, isPending:isPendingUpdate , isError:isErrorUpdate , isSuccess:isSuccessUpdate } = mutationUpdate
   const { data:dataDelete, isPending:isPendingDelete , isError:isErrorDelete , isSuccess:isSuccessDelete } = mutationDelete
+  const { data:dataDeleteMany, isPending:isPendingDeleteMany , isError:isErrorDeleteMany , isSuccess:isSuccessDeleteMany } = mutationDeleteMany
+
 
   const queryProduct = useQuery({ queryKey: ['products'], queryFn: getAllProducts });
   const {isLoading: isLoadingProduct , data: products} = useQuery({queryKey: ['products'] , queryFn: getAllProducts})
@@ -319,7 +341,15 @@ const getColumnSearchProps = dataIndex => ({
         messageApi.error('Cập nhật thất bại!');
       }
     }, [isSuccess, isError, messageApi]);
-
+    useEffect(() => {
+      console.log('isSuccess:', isSuccessDeleteMany, 'isError:', isErrorDeleteMany);
+      if (isSuccessDeleteMany && data?.status ==='ok') {
+        messageApi.success('xóa thành công!');
+        handleCloseDrawer()
+      } else if (isErrorDeleteMany) {
+        messageApi.error('xóa thất bại!');
+      }
+    }, [isSuccess, isError, messageApi]);
     const handleCloseDrawer = () => {
     SetIsOpenDraw(false);
     setStateProduct({
@@ -348,7 +378,7 @@ const getColumnSearchProps = dataIndex => ({
       type:'',
       CountInStock:''
     })
-    form.resetField()
+    form.resetFields()
   }
   const onFinish = () => {
     mutation.mutate(stateProduct,
@@ -484,7 +514,7 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
         <Button style={{height : '150px' ,width : '150px' , borderRadius: '6px', borderStyle:'dashed'}} onClick={() => setIsModelOpen(true) }  ><PlusCircleFilled style={{fontSize: '60px'}}/></Button>
     </div>
     <div style={{ marginTop : '20px'}}>
-    <TableComponent columns={columns} isLoading={isLoadingProduct} data={dataTable}  onRow={(record , rowIndex) => {
+    <TableComponent  columns={columns} isLoading={isLoadingProduct} data={dataTable} handleDeleteManyProduct={handleDeleteManyProduct} onRow={(record , rowIndex)  => {
       return {
         onClick: event => {
           SetRowSelected(record._id)
@@ -678,7 +708,6 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
     </div>
   )
 };
-
 const WrappedProfilePage = () => (
   <App>
     <AdminProduct />

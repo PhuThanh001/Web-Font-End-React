@@ -35,7 +35,8 @@ export const getUserDetails = async (id, access_token) => {
         }
     });
     console.log('getUserDetails function called with token:', access_token);
-    return res.data;
+    console.log('resuserDetail' , res.data)
+    return res;
 }
 export const refreshToken = async () => {
     const res = await axios.post(`${import.meta.env.VITE_API_URL}/user/refresh-token` ,{
@@ -53,5 +54,15 @@ export const updateUser = async (id , data, access_token) => {
             token: `Bearer ${access_token}`
         }}
     )
+    console.log('token' , access_token)
     return res.data
+}
+export const Delete_many_user  = async (data ,access_token) => {
+    const res = await axiosJWT.delete(`${import.meta.env.VITE_API_URL}/product/delete-many`, data , {
+        headers: {
+            token: `Bearer ${access_token}`
+        }
+    });
+    console.log('res.data' ,res.data)
+    return res.data;
 }
