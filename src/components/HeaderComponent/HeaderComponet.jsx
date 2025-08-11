@@ -11,7 +11,9 @@ import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useSelector ,useDispatch } from 'react-redux';
 import * as UserService from '../../service/UserService';
-import { resetUser } from '../../redux/slides/userSilde';
+import { resetUser, updateUser } from '../../redux/slides/userSilde';
+import { searchProduct } from '../../redux/slides/productSlide';
+
 import Loading from '../LoadingComponent/loading';
 // ✅ Component
 const HeaderComponent = ({isHiddenSearch = false ,isHiddentCart = false}) => {
@@ -21,6 +23,7 @@ const HeaderComponent = ({isHiddenSearch = false ,isHiddentCart = false}) => {
   const [userAvatar , setUserAvatar] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state) => state.user);
+  const [search , setSearch] = useState('');
   
   const handleLogout = async () => {
     setIsLoading(true);
@@ -55,8 +58,14 @@ const content = (
   const handlerNavigationLogin = () => {
     Navigate('/signin'); // Navigate to the SignIn page
   }
+  const onSearch = (e) => {  
+      setSearch(e.target.value)
+      dispatch(searchProduct(e.target.value))
+      console.log('e' , e.target.value)
+  }
   console.log('user:', user);
   return (
+    <Loading isPending={isLoading}>
     <div style={{width : '100%' ,background : 'rgb(26,148,255)' ,display : 'flex' ,justifyContent : 'center' }}>
               <WrapperHeader style={{ justifyContent: isHiddenSearch && isHiddentCart ? 'space-between' : 'unset'}}>
           <Row align="middle">
@@ -67,8 +76,10 @@ const content = (
                 <Col span={13}>
                   <ButtonInputSearch
                       placeholder="input search text"
+                      bordered = {false} 
                       textButton = "Tim kiếm" 
                       size = "large"
+                      onChange={onSearch}
                   />
               </Col>
               )}
@@ -125,6 +136,7 @@ const content = (
           </Row>
       </WrapperHeader>
     </div>  
+    </Loading>
   )
 }
 export default HeaderComponent

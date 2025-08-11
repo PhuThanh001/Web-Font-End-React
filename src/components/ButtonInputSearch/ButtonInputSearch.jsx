@@ -11,7 +11,7 @@ const ButtonInputSearch = (props) => {
     textButton,
     bordered,
     backgroundColorInput = '#fff',
-    backgroundColorButton = 'rgb(13, 92, 182)',
+    backgroundColorButton = 'rgba(31, 69, 112, 1)',
     colorButton = '#fff',
   } = props;
 
@@ -22,14 +22,15 @@ const ButtonInputSearch = (props) => {
         placeholder={PlaceHolder}
         borderless={bordered} // đã đúng
         style={{ backgroundColor: backgroundColorInput }}
+        {...props}
       />
       <ButtonComponent
         size={size}
-        icon={<SearchOutlined color = "colorButton" style={{color : '#fff'}} />}
-        styleButton={{ background : backgroundColorButton,  bordered : !bordered && 'none' }}  
-        textButton={ textButton}
-        styleTextButton={{color : colorButton}}
-      > 
+        icon={<SearchOutlined color="colorButton" style={{ color: '#fff' }} />}
+        styleButton={{ background: backgroundColorButton, bordered: !bordered && 'none' }}
+        textButton={textButton}
+        styleTextButton={{ color: colorButton }}
+      >
         <span style={{ color: colorButton }}>{textButton}</span>
       </ButtonComponent>
     </div>

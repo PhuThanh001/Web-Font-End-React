@@ -8,6 +8,7 @@ import SignInPage from '../pages/SignInPage/SignInPage'
 import SignUpPage from '../pages/SignUpPage/SignUpPage'
 import ProfilePage from '../pages/ProfilePage/ProfilePage'
 import AdminPage from '../pages/AdminPage/AdminPage'
+import ProductDetailsPage from '../pages/ProductPageDetail/ProductDetailsPage'
 
 export const routes = [
     {
@@ -58,6 +59,12 @@ export const routes = [
     {
       path : '/system/admin',
       page : AdminPage,
+      isShowHeader : false,
+      isPrivate: true
+    },
+    {
+      path : '/Product-details/:id',
+      page : ProductDetailsPage,
       isShowHeader : false,
       isPrivate: true
     },

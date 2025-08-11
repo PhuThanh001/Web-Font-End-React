@@ -21,7 +21,6 @@ const TableComponent = (props) => {
         str2Percent: true
       })
       .saveAs("Excel.xlsx");
-
     }
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
