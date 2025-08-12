@@ -2,10 +2,31 @@ import axios from "axios";
 
 export const axiosJWT = axios.create({
 });
-export const GetAllProduct = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll`);
+// export const GetAllProduct = async (search ) => {
+//     let res = {}
+//     console.log('search' , search.length)
+//     if(search.length > 0){
+//          res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?filter=name&filter=${search}`)
+//     }else {    
+//          res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll`);
+//     }
+//     console.log('Allproduct' , res.data)
+//     return res.data;
+// }
+export const GetAllProduct = async (search , limit) => {
+    let res = {};
+    console.log('🔎 search', search?.length);
+    console.log('🔎 limit', limit);
+    if (search?.length > 0) {
+        const cleanedSearch = search?.replace(/"/g, '');
+        res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?filter=name&value=${cleanedSearch}&limit=${limit}`);
+
+    } else {
+        res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?limit=${limit}`);
+    }
+    console.log('📦 Allproduct:', res.data);
     return res.data;
-}
+};
 export const CreateProduct  = async (data) => {
     const res = await axios.post('/api/product/create', data);
     return res.data;
@@ -33,12 +54,14 @@ export const DeleteProduct  = async (id ,access_token) => {
     return res.data;
 }
 export const Delete_many_product  = async (access_token ,data) => {
-        console.log('token' , access_token)
-        console.log('data' , data)
     const res = await axiosJWT.post(`${import.meta.env.VITE_API_URL}/product/delete-many`, data , {
         headers: {
             token: `Bearer ${access_token}`
         }
     });
+    return res.data;
+}
+export const get_all_type_product  = async () => {
+    const res = await axiosJWT.get(`${import.meta.env.VITE_API_URL}/product/getAllType`)
     return res.data;
 }

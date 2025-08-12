@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {useQuery} from '@tanstack/react-query'
 import TableComponent from '../TableComponent/TableComponent'
-import { Descriptions, Table ,Modal, Space  } from 'antd';
+import { Descriptions, Table ,Modal, Space, Select  } from 'antd';
 import { WrapperHeader ,WrapperUpLoadFile  } from './style';
 import {DeleteOutlined, PlusCircleFilled,EditOutlined , SearchOutlined} from '@ant-design/icons'
 import {Button ,App,Form  } from 'antd'
 import { useSelector } from 'react-redux';
 import Input from 'antd/es/input/Input';
 import InputComponent from '../InputComponent/InputComponent'
-import { getBase64 } from '../../utils';
+import { getBase64, renderOptions } from '../../utils';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as ProductService  from '../../service/ProductService';
 import Loading from '../LoadingComponent/loading';
@@ -27,6 +27,7 @@ const AdminProduct = () => {
   const [isModalOpenDelete , SetIsModalOpenDelete] = useState(false)
   const user = useSelector((state) => state?.user)
   const [form] = Form.useForm();
+  const [typeSelect , setTypeSelect] = useState('')
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
@@ -35,16 +36,17 @@ const AdminProduct = () => {
     name: '',
     price:'',
     type:'',
-    Descriptions:'',
+    description:'',
     rating:'',
     image:'',
-    CountInStock:''
+    countInStock:'',
+    newType:''
   })
   const [stateProductDetails , setStateProductDetails] = useState({
     name: '',
     price:'',
     type:'',
-    descriptions:'',
+    description:'',
     rating:'',
     image:'',
     CountInStock:''
@@ -119,7 +121,7 @@ const AdminProduct = () => {
         name: res?.data.name,
         price: res?.data.price,
         type: res?.data.type,
-        descriptions: res?.data.description,
+        description: res?.data.description,
         rating: res?.data.rating,
         image: res?.data.image,
         countInStock: res?.data.CountInStock
@@ -148,6 +150,14 @@ const AdminProduct = () => {
     console.log('rowSelected' , rowSelected)
     SetIsOpenDraw(true)
   }  
+  const handleChangeSelect = (value) => {
+        setStateProduct({
+        ...stateProduct,
+        type:value
+      })
+  }  
+  console.log('value={stateProduct.type}', stateProduct.type )
+
   const handleDeleteProduct = () => {
     mutationDelete.mutate({id:  rowSelected , token: user?.access_token}),{
       onSettled: () => {
@@ -163,13 +173,20 @@ const AdminProduct = () => {
       }
     }
   }
+const FetchAllTypeProduct = async () => {
+  const res = await ProductService.get_all_type_product();
+  console.log("📌 API trả về:", res);
+  return res;
+}
   const { data, isPending , isError , isSuccess } = mutation
   const { data:dataUpdate, isPending:isPendingUpdate , isError:isErrorUpdate , isSuccess:isSuccessUpdate } = mutationUpdate
   const { data:dataDelete, isPending:isPendingDelete , isError:isErrorDelete , isSuccess:isSuccessDelete } = mutationDelete
   const { data:dataDeleteMany, isPending:isPendingDeleteMany , isError:isErrorDeleteMany , isSuccess:isSuccessDeleteMany } = mutationDeleteMany
 
-
+  const TypeProduct = useQuery({ queryKey: ['type-products'], queryFn: FetchAllTypeProduct });
+  console.log('typeProduct' , TypeProduct)
   const queryProduct = useQuery({ queryKey: ['products'], queryFn: getAllProducts });
+  console.log('sản phẩm nè' , queryProduct)
   const {isLoading: isLoadingProduct , data: products} = useQuery({queryKey: ['products'] , queryFn: getAllProducts})
 
   const renderAction = () => {
@@ -331,7 +348,6 @@ const getColumnSearchProps = dataIndex => ({
         messageApi.error('Cập nhật thất bại!');
       }
     }, [isSuccess, isError, messageApi]);
-
     useEffect(() => {
       console.log('isSuccess:', isSuccessDelete, 'isError:', isErrorDelete);
       if (isSuccessDelete && data?.status ==='ok') {
@@ -361,7 +377,7 @@ const getColumnSearchProps = dataIndex => ({
       type:'',
       CountInStock:''
     })
-    form.resetField()
+    form.resetFields()
   }
   const [avatar, setAvatar] = useState('');
   const  handleCancelDelete = () => {
@@ -381,13 +397,21 @@ const getColumnSearchProps = dataIndex => ({
     form.resetFields()
   }
   const onFinish = () => {
-    mutation.mutate(stateProduct,
+    const params = {
+      name: stateProduct.name,
+      price: stateProduct.price,
+      type: stateProduct.type === 'add_type' ? stateProduct.newType : stateProduct.type,
+      description: stateProduct.description,
+      rating: stateProduct.rating,
+      image: stateProduct.image,
+      countInStock: stateProduct.countInStock,
+    }
+    mutation.mutate(params,
       {onSettled: () => {
             queryProduct.refetch()
       }
   })
   }
-
   const handleOnChange = (e) => {
       setStateProduct({
         ...stateProduct,
@@ -482,31 +506,8 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
     console.error('Lỗi khi nén hoặc chuyển file sang base64:', error);
   }
 };
-  //   const handleOnchangeAvatarDetails = async (uploadData) => {
-  //   console.log('🔥 uploadData:', uploadData);
-  //   if (!uploadData || !uploadData.fileList || !Array.isArray(uploadData.fileList) || uploadData.fileList.length === 0) {
-  //     console.log('⚠️ fileList không hợp lệ hoặc rỗng');
-  //     return;
-  //   }
-  //   const file = uploadData.fileList[0];
-  //   console.log('📁 file:', file);
+const typeList = TypeProduct?.data?.data?.data || [];
 
-  //   if (!file.url && !file.preview) {
-  //     console.log('🔄 Chưa có url/preview, bắt đầu đọc file...');
-  //     try {
-  //       file.preview = await getBase64(file.originFileObj);
-  //       console.log('✅ file.preview:', file.preview);
-  //               setStateProductDetails({
-  //         ...stateProductDetails,
-  //         image: file.preview
-  //       })
-  //     } catch (error) {
-  //       console.error('Lỗi khi chuyển file sang base64:', error);
-  //     }
-  //   } else {
-  //     setAvatar(file.preview || file.url);
-  //   }
-  // };
   return (
     <div>
     <WrapperHeader>Quản lý Sản Phẩm </WrapperHeader>
@@ -551,16 +552,30 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
           <Form.Item
             label="Type"
             name="type"
-            rules={[{ required: true, message: 'Please input your Type!' }]}
+            rules={[{ required: true, message: 'Please input your Typiuiuiuiuiu!' }]}
             >
-            <InputComponent value={stateProduct.type} onChange={handleOnChange} name="type" /> 
+                <Select
+                  name= "type"
+                  onChange={handleChangeSelect}
+                  value={stateProduct.type}
+                  options={renderOptions(Array.isArray(typeList) ? typeList : [])}
+                />
           </Form.Item>
+           {stateProduct.type === 'add_type' && (
+            <Form.Item
+                label="New type"
+                name="newType"
+                rules={[{ required: true, message: 'Please input your Typeeeeeee!' }]}
+            >
+                    <InputComponent value={stateProduct.newType} onChange={handleOnChange} name="newType"/>         
+            </Form.Item>
+           )}
           <Form.Item
             label="CountInStock"
             name="countInStock"
             rules={[{ required: true, message: 'Please input your Count In Stock!' }]}
             >
-            <InputComponent value={stateProduct.CountInStock} onChange={handleOnChange} name="countInStock"/> 
+            <InputComponent value={stateProduct.countInStock} onChange={handleOnChange} name="countInStock"/> 
           </Form.Item>
           <Form.Item
             label="Price"
@@ -581,7 +596,7 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
             name="description"
             rules={[{ required: true, message: 'Please input your Decription!' }]}
             >
-            <InputComponent value={stateProduct.Descriptions} onChange={handleOnChange} name="description"/> 
+            <InputComponent value={stateProduct.description} onChange={handleOnChange} name="description"/> 
           </Form.Item>
           <Form.Item
             label="Image"
@@ -661,7 +676,7 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
           </Form.Item>
           <Form.Item
             label="Description"
-            name="descriptions"
+            name="description"
             rules={[{ required: true, message: 'Please input your Decription!' }]}
             >
             <InputComponent value={stateProductDetails['Descriptions']} onChange={handleOnChangeDetails} name="decription"/> 

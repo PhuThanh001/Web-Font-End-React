@@ -4,7 +4,7 @@ import userReducer from './slides/userSilde'; // Đường dẫn tương đối
 
 export const store = configureStore({
   reducer: {
-    product : productReducer,
+    product: productReducer,
     user: userReducer,
   },
 

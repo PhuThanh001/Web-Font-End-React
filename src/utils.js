@@ -13,3 +13,20 @@ export const getBase64 = (file) =>
     reader.onload = () => resolve(reader.result);
     reader.onerror = (error) => reject(error);
   });
+  export const renderOptions = (arr = []) => {
+          let results = []
+          if(arr) {
+            results = arr?.map((opt) =>{
+              return {
+                value: opt,  
+                label: opt
+              }
+            } )
+          }
+          console.log('arr:', arr, 'isArray:', Array.isArray(arr))
+          results.push({
+            label: 'Thêm type' ,
+            value: 'add_type'
+          })
+          return results
+    }

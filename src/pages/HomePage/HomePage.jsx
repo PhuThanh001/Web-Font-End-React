@@ -22,13 +22,7 @@ const HomePage = () => {
     const [stateProducts, setStateProducts] = useState([])
     const [loading, setLoading] = useState(false)
     const [limit, setLimit] = useState(6)
-    // const fetchProductAll = async (context) => {
-    //     const limit = context?.queryKey[1] && context?.queryKey
-    //     const search = context?.queryKey[2] && context?.queryKey
-    //     const res = await ProductService.GetAllProduct(search, limit)
-    //     console.log('first', res)
-    //     return res
-    // }
+    const [typeProducts , setTypeProducts] = useState([]) //lỗi trả về data.data
     const fetchProductAll = async ({ queryKey }) => {
     const [_key, limit, search] = queryKey;
     console.log('limit', limit)
@@ -38,6 +32,13 @@ const HomePage = () => {
     useEffect(() => {
         console.log('🔁 Limit changed to:', limit)
     } ,[limit])
+    const FetchAllTypeProduct = async() => {
+        const res = await ProductService.get_all_type_product()
+        if(res?.status === 'OK') 
+            {        
+                setTypeProducts(res?.data.data)
+            }
+    }
     const { isLoading, data: products, isPreviousdata } = useQuery({
         queryKey: ['products', limit ,searchDebounce],
         queryFn: fetchProductAll,
@@ -45,12 +46,9 @@ const HomePage = () => {
         retryDelay: 1000,
         keepPreviousData: true
     }); 
-    // useEffect(() => {
-    //     if(products?.length > 0){
-    //         setStateProducts(products)
-    //     }
-    // },[products])
-    // console.log('setStateProducts' , stateProducts)
+    useEffect(() => {
+        FetchAllTypeProduct()    
+    },[])
     return (
         <>
             <div style={{ padding: '0 120px', margin: '0 auto', width: '1270px' }}>
