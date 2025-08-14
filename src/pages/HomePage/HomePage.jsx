@@ -32,13 +32,14 @@ const HomePage = () => {
     useEffect(() => {
         console.log('🔁 Limit changed to:', limit)
     } ,[limit])
-    const FetchAllTypeProduct = async() => {
-        const res = await ProductService.get_all_type_product()
-        if(res?.status === 'OK') 
-            {        
-                setTypeProducts(res?.data.data)
-            }
-    }
+    const FetchAllTypeProduct = async () => {
+        const res = await ProductService.get_all_type_product();
+        console.log("[DEBUG] get_all_type_product response:", res);
+
+        if (res?.status === 'OK') {
+            setTypeProducts(res?.data?.data || []); // lấy mảng ["phone", "phone111"]
+        }
+    };
     const { isLoading, data: products, isPreviousdata } = useQuery({
         queryKey: ['products', limit ,searchDebounce],
         queryFn: fetchProductAll,
@@ -53,7 +54,7 @@ const HomePage = () => {
         <>
             <div style={{ padding: '0 120px', margin: '0 auto', width: '1270px' }}>
                 <WrapperTypeProduct>
-                    {arr.map((item) => {
+                    {typeProducts.map((item) => {
                         return (
                             <TypeProduct name={item} key={item} />
                         )

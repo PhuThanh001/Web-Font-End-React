@@ -29,7 +29,7 @@ export const routes = [
 
     },
         {
-      path : '/Type',
+      path : '/product/:type',
       page : TypeProductPage,
       isShowHeader : true
 
@@ -59,13 +59,19 @@ export const routes = [
     {
       path : '/system/admin',
       page : AdminPage,
-      isShowHeader : false,
+      isShowHeader : true,
       isPrivate: true
     },
     {
       path : '/Product-details/:id',
       page : ProductDetailsPage,
-      isShowHeader : false,
+      isShowHeader : true,
+      isPrivate: true
+    },
+    {
+      path : '/Product/:type',
+      page : TypeProductPage,
+      isShowHeader : true,
       isPrivate: true
     },
     {

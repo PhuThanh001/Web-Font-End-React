@@ -27,6 +27,18 @@ export const GetAllProduct = async (search , limit) => {
     console.log('📦 Allproduct:', res.data);
     return res.data;
 };
+// export const GetProductType = async (type) => {
+//     if (type) {
+//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAllType?filter=type&filter=${type}`);
+//         return res.data
+//     } 
+// };
+export const GetProductType = async (type) => {
+    console.log("🌐 [DEBUG] Gửi request API GetProductType với type:", type);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?filter=type&filter=${type}`);
+    console.log("🌐 [DEBUG] API phản hồi:", res);
+    return res.data;
+};
 export const CreateProduct  = async (data) => {
     const res = await axios.post('/api/product/create', data);
     return res.data;

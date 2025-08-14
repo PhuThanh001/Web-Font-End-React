@@ -17,7 +17,7 @@ import { searchProduct } from '../../redux/slides/productSlide';
 import Loading from '../LoadingComponent/loading';
 // ✅ Component
 const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [userName, setUserName] = useState('');
   const [userAvatar, setUserAvatar] = useState('');
@@ -125,7 +125,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
               </Loading>
               {!isHiddentCart && (
                 <div>
-                  <div>
+                  <div onClick={() => navigate('/order')} style={{cursor:'pointer'}}>
                     <Badge size="small" count={4}></Badge>
                     <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
                     <WrapperTextHeaderSmall> giỏ hàng  </WrapperTextHeaderSmall>
