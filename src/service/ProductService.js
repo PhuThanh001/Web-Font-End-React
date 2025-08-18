@@ -15,8 +15,6 @@ export const axiosJWT = axios.create({
 // }
 export const GetAllProduct = async (search , limit) => {
     let res = {};
-    console.log('🔎 search', search?.length);
-    console.log('🔎 limit', limit);
     if (search?.length > 0) {
         const cleanedSearch = search?.replace(/"/g, '');
         res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?filter=name&value=${cleanedSearch}&limit=${limit}`);
@@ -24,7 +22,6 @@ export const GetAllProduct = async (search , limit) => {
     } else {
         res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?limit=${limit}`);
     }
-    console.log('📦 Allproduct:', res.data);
     return res.data;
 };
 // export const GetProductType = async (type) => {
@@ -33,10 +30,14 @@ export const GetAllProduct = async (search , limit) => {
 //         return res.data
 //     } 
 // };
-export const GetProductType = async (type) => {
-    console.log("🌐 [DEBUG] Gửi request API GetProductType với type:", type);
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?filter=type&filter=${type}`);
-    console.log("🌐 [DEBUG] API phản hồi:", res);
+// export const GetProductType = async (type, page ,limit) => {
+//     const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?filter=type&filter=${type}&limit=${limit}&page=${page}`);
+//     return res.data;
+// };
+export const GetProductType = async (type, page, limit) => {
+    const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/product/getAll?filter=type&value=${type}&limit=${limit}&page=${page}`
+    );
     return res.data;
 };
 export const CreateProduct  = async (data) => {
