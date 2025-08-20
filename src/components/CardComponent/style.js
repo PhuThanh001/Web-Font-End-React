@@ -31,6 +31,7 @@ export const WrapperReportText = styled.div`
     margin : 6px 0 0px; 
 `
 export const WrapperPriceText = styled.div`
+    display : flex;
     color :rgb(255 ,66 ,78);
     font-size : 16px;
     font-weight : 500; 

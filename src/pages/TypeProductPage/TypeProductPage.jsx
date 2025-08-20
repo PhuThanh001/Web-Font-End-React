@@ -1,5 +1,6 @@
 import { Col, Pagination, Row } from 'antd'
-import React, { Fragment, useEffect, useState, useSelector} from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import NavbarComponent from '../../components/NavbarComponent/NavbarComponent'
 import CardComponent from '../../components/CardComponent/CardComponent'
 import { WrapperNavbar, WrapperProducts } from '../../components/TypeProduct/Style'
@@ -20,13 +21,11 @@ const TypeProductPage = () => {
         })
         const fetchProductType = async (type , page, limit) => {
                 try {
-                        console.log('type' , type)
                         const res = await ProductService.GetProductType(type, page, limit)
                         if(res?.status == 'OK'){
                                 setLoading(false)
                                 setProducts(res?.data?.data)
                                 setPanigate({...panigate, total:res?.total})
-                                console.log('type ne' , res)
                         }
                 } catch (err) {
                         console.error('❌ Lỗi gọi API:', err)

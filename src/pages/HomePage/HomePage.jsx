@@ -25,6 +25,7 @@ const HomePage = () => {
     const [typeProducts , setTypeProducts] = useState([]) //lỗi trả về data.data
     const fetchProductAll = async ({ queryKey }) => {
     const [_key, limit, search] = queryKey;
+
     console.log('limit', limit)
     const res = await ProductService.GetAllProduct(search, limit);
     return res;
@@ -80,7 +81,7 @@ const HomePage = () => {
                                     selled={product.selled}
                                     discount={product.discount}
                                     id={product._id}
-                                     />
+                                    />
                             )
                         })}
                     </WrapperProducts>

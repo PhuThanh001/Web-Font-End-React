@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { use, useEffect } from 'react'
 import { WrapperContainerLeft, WrapperContainerRight } from './style'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import InputForm from '../../components/InputForm/InputForm'
 import imagelogo from '../../assets/image/Imagelogo.png'
 import { Image, message } from 'antd'
 import { WrapperTextLight } from './style'
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
@@ -23,6 +23,7 @@ const SignInPage = () => {
   const [password, setPassword] = React.useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const handlerNavigationSignUp = () => {
     navigate('/signup'); // Navigate to the SignUp page
@@ -30,27 +31,31 @@ const SignInPage = () => {
   const mutation = useMutationHook(
     data  => UserService.loginUser(data)
     )
-    console.log('mutation:', mutation);
     const {data, isPending ,isSuccess} = mutation;
     useEffect(() => {
     if (isSuccess) {
-      navigate('/');
+      if(location?.state) {
+        navigate(location?.state)
+      }else{
+        navigate('/');
+      }
       localStorage.setItem('access_token', JSON.stringify(data?.access_token));
+      localStorage.setItem('user', JSON.stringify(data?.data));
       if (data?.access_token) {
         const decodedToken = jwtDecode(data?.access_token);
-        console.log('decode:', decodedToken);
         if(decodedToken?.id){
            handleGetDetailsUser(decodedToken?.id, data?.access_token);
         }
       }
     }
   }, [isSuccess]);
-  
-const handleGetDetailsUser = async (id , token) => {
-      const res =  await UserService.getUserDetails(id, token);
-      console.log('res:', res);
-      dispatch(updateUser({ ...res?.data, access_token: token }));
-  }
+const handleGetDetailsUser = async (id, token) => {
+  const res = await UserService.getUserDetails(id, token);
+  console.log('Response from getUserDetails:', res);
+  const payload = { ...(res?.data?.data || res?.data), access_token: token };
+  console.log('Payload for updateUser:', payload);
+  dispatch(updateUser(payload));
+}
   const handleOnChangeEmail = (value) => {
     setEmail(value);
   }
@@ -60,7 +65,6 @@ const handleGetDetailsUser = async (id , token) => {
   const handleSignIn = () => {
     mutation.mutate({ email, password });
   }  
-
   return (
       <div style={{ display : 'flex' , alignItems : 'center' , justifyContent : 'center', background: 'rgb(0,0,0,0.53 )', height :'100vh' }}>
             <div style={{ height : '445px' , width : '800px' , borderRadius : '6px' , background : '#fff' , display : 'flex' }}>

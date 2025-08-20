@@ -40,7 +40,8 @@ const AdminProduct = () => {
     rating:'',
     image:'',
     countInStock:'',
-    newType:''
+    newType:'',
+    discount: ''
   })
   const [stateProductDetails , setStateProductDetails] = useState({
     name: '',
@@ -49,7 +50,8 @@ const AdminProduct = () => {
     description:'',
     rating:'',
     image:'',
-    CountInStock:''
+    countInStock:'',
+    discount: ''
   })
   const mutation = useMutationHook((data) => {
     const {
@@ -60,6 +62,7 @@ const AdminProduct = () => {
       countInStock :countInStock,
       image,
       type,
+      discount
     } = data
     const res = ProductService.CreateProduct({
       name,
@@ -68,7 +71,8 @@ const AdminProduct = () => {
       rating ,
       countInStock ,
       image,
-      type
+      type,
+      discount
     })
     return res
   })
@@ -110,7 +114,7 @@ const AdminProduct = () => {
   },
 )
     const getAllProducts = async () => {
-    const res = await ProductService.GetAllProduct()
+    const res = await ProductService.GetAllProduct( '' , 100 )
     console.log('product ', res)
     return res
   }
@@ -124,7 +128,8 @@ const AdminProduct = () => {
         description: res?.data.description,
         rating: res?.data.rating,
         image: res?.data.image,
-        countInStock: res?.data.CountInStock
+        countInStock: res?.data.countInStock,
+        discount: res?.data.discount
       })
     }
     SetIsLoadingUpdate(false)
@@ -405,6 +410,7 @@ const getColumnSearchProps = dataIndex => ({
       rating: stateProduct.rating,
       image: stateProduct.image,
       countInStock: stateProduct.countInStock,
+      discount: stateProduct.discount
     }
     mutation.mutate(params,
       {onSettled: () => {
@@ -599,6 +605,13 @@ const typeList = TypeProduct?.data?.data?.data || [];
             <InputComponent value={stateProduct.description} onChange={handleOnChange} name="description"/> 
           </Form.Item>
           <Form.Item
+            label="Discount"
+            name="discount"
+            rules={[{ required: true, message: 'Please input your discount!' }]}
+            >
+            <InputComponent value={stateProduct.discount} onChange={handleOnChange} name="discount"/> 
+          </Form.Item>
+          <Form.Item
             label="Image"
             name="image"
             rules={[{ required: true, message: 'Please input your Image!' }]}
@@ -658,7 +671,7 @@ const typeList = TypeProduct?.data?.data?.data || [];
             name="countInStock"
             rules={[{ required: true, message: 'Please input your Count In Stock!' }]}
             >
-            <InputComponent value={stateProductDetails['CountInStock']} onChange={handleOnChangeDetails} name="countInStock"/> 
+            <InputComponent value={stateProductDetails['countInStock']} onChange={handleOnChangeDetails} name="countInStock"/> 
           </Form.Item>
           <Form.Item
             label="Price"
@@ -680,6 +693,13 @@ const typeList = TypeProduct?.data?.data?.data || [];
             rules={[{ required: true, message: 'Please input your Decription!' }]}
             >
             <InputComponent value={stateProductDetails['Descriptions']} onChange={handleOnChangeDetails} name="decription"/> 
+          </Form.Item>
+          <Form.Item
+            label="discount"
+            name="discount"
+            rules={[{ required: true, message: 'Please input your discount!' }]}
+            >
+            <InputComponent value={stateProductDetails['discount']} onChange={handleOnChangeDetails} name="discount"/> 
           </Form.Item>
           <Form.Item
             label="Image"

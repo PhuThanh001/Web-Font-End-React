@@ -12,13 +12,20 @@ import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch'
 import * as ProductService  from '../../service/ProductService';
 import { useQuery } from '@tanstack/react-query'
 import Loading from '../LoadingComponent/loading';
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { addOrderProduct } from '../../redux/slides/orderSlide'
+import { convertPrice } from '../../utils'
 
 
 const ProductdetailsComponent = ({idProduct}) => {
         
         const [numProduct ,setNumProduct] = useState(1)
         const user = useSelector((state) => state.user)
+        const navigate = useNavigate()
+        const location = useLocation()
+        const dispatch = useDispatch()
+
         const onChange = (value) =>
         {
                 setNumProduct(Number(value))
@@ -32,7 +39,6 @@ const ProductdetailsComponent = ({idProduct}) => {
         }
         const fetchGetDetailsProduct = async (context) =>{
             const id = context?.queryKey && context?.queryKey[1]
-            console.log('ID' , id)
             const res = await ProductService.GetDetailsProduct(id)
             return res?.data
         }         
@@ -40,8 +46,23 @@ const ProductdetailsComponent = ({idProduct}) => {
                 queryKey: ['products-details',idProduct],
                 queryFn: fetchGetDetailsProduct,
                 enabled: !!idProduct
-        });     
-        console.log('productDetail' , productDetails)
+        });
+        const handleAddOrderProduct = async () => {
+                if(!user?.id){
+                        navigate('/SignIn' ,  {state : location?.pathname}) 
+                }else{
+                        dispatch(addOrderProduct({
+                                orderItem: {
+                                        name: productDetails.name,
+                                        amount: numProduct,
+                                        image: productDetails.image,
+                                        price: productDetails.price,
+                                        product: productDetails?._id
+                                }
+                        }))
+                }
+        }
+        console.log('productDetails' , productDetails , user)
         return (
                 <Loading isPending={isLoading}>
                 <Row style={{backgroundColor : '#fff' , padding : '16px' ,borderRadius : '4px'}} >
@@ -63,9 +84,9 @@ const ProductdetailsComponent = ({idProduct}) => {
                 <div>   
                         <Rate allowHalf defaultValue={productDetails?.rating} value={productDetails?.rating}/>
                         <WrapperStyleTextSell>  |da ban 1000+ </WrapperStyleTextSell>
-                </div>
+                </div>  
                         <WrapperPriceProduct>
-                                <WrapperPriceText>{productDetails?.price}</WrapperPriceText>
+                                <WrapperPriceText>{convertPrice(productDetails?.price)}</WrapperPriceText>
                         </WrapperPriceProduct>
                         <WrapperAddressProduct>
                                 <span>Giao đến</span>
@@ -101,7 +122,8 @@ const ProductdetailsComponent = ({idProduct}) => {
                                                 borderRadius : '4px'
                                          }}
                                          textButton ={ 'Chọn mua'}
-                                         styleTextButton = {{ color : '#efefef' , fontSize : '15px', fontWeight : '700'}} >
+                                         styleTextButton = {{ color : '#efefef' , fontSize : '15px', fontWeight : '700'}}
+                                         onClick={handleAddOrderProduct}  >
                                 </ButtonComponent>
                                 <ButtonComponent
                                         size = {40} 
@@ -117,7 +139,6 @@ const ProductdetailsComponent = ({idProduct}) => {
                                          styleTextButton = {{ color : '#efefef'  ,fontSize : '15px', fontWeight : '700'}}>
                                 </ButtonComponent>
                                 </div>
-                                
         </Col>
         </Row>  
         </Loading>

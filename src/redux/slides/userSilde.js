@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { Avatar } from 'antd';
 
-const initialState = {
+const initialState = JSON.parse(localStorage.getItem('user')) || {
   email: '',
   name: '',
   access_token: '',
@@ -35,7 +35,7 @@ updateUser: (state, action) => {
   state.avatar = avatar;
   state.phone = phone;
   state.id = _id;
-  state.isAdmin = isAdmin; 
+  state.isAdmin = isAdmin;
 },
 resetUser: (state) => {
   state.name = '';

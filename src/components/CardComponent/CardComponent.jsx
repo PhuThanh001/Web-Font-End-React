@@ -1,4 +1,4 @@
-import { Card } from 'antd'
+import { Card, Flex } from 'antd'
 import Meta from 'antd/es/card/Meta'
 import React from 'react'
 import { WrapperIconHeader } from '../HeaderComponent/Style'
@@ -8,6 +8,7 @@ import { WrapperPriceText } from './style'
 import {StarFilled} from '@ant-design/icons'
 import logo from '../../assets/image/logo.jpg';
 import { useNavigate } from 'react-router-dom'
+import { convertPrice } from '../../utils'
 
 const CardComponent = (props) => {
   const {countInStock ,description , image ,name ,rating, price ,type,discount , selled , id } = props
@@ -35,7 +36,7 @@ const CardComponent = (props) => {
         </span>
                </WrapperReportText>  
         <WrapperPriceText> 
-            <span style={{ marginRight:'8px' }} >{price?.toLocaleString()}</span> 
+            <span style={{ display: Flex , marginRight:'8px' }} >{convertPrice(price)}</span> 
         <WrapperDiscountText>
             {discount || -5} % 
         </WrapperDiscountText>

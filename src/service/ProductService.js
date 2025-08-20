@@ -24,16 +24,6 @@ export const GetAllProduct = async (search , limit) => {
     }
     return res.data;
 };
-// export const GetProductType = async (type) => {
-//     if (type) {
-//         const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAllType?filter=type&filter=${type}`);
-//         return res.data
-//     } 
-// };
-// export const GetProductType = async (type, page ,limit) => {
-//     const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll?filter=type&filter=${type}&limit=${limit}&page=${page}`);
-//     return res.data;
-// };
 export const GetProductType = async (type, page, limit) => {
     const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/product/getAll?filter=type&value=${type}&limit=${limit}&page=${page}`

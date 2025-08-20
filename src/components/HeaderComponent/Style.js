@@ -2,7 +2,7 @@ import { Row } from "antd";
 import styled from "styled-components";
 
 export const WrapperHeader = styled.div`
-  width: 1270%;
+  width: 100%;
   background-color:rgb(14, 63, 136);
   padding: 10px 0 ;
   align-items : center;
@@ -17,7 +17,7 @@ export const WrapperTextHeader = styled.span`
 `
 export const WrapperHeaderAccount = styled.div`
     display : flex;
-    align-item : center;
+    align-items : center;
     color : #fff;
     gap : 10px ;
 `
@@ -34,4 +34,5 @@ export const WrapperContentPopUp = styled.p`
     cursor: pointer;
     &:hover {
         color : rgb(26,148,255);
-    }`
+    }
+`
