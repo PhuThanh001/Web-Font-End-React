@@ -2,7 +2,7 @@ import { Card, Flex } from 'antd'
 import Meta from 'antd/es/card/Meta'
 import React from 'react'
 import { WrapperIconHeader } from '../HeaderComponent/Style'
-import { WrapperDiscountText, WrapperReportText } from './style'
+import { WrapperDiscountText, WrapperReportText ,WrapperCardStyle } from './style'
 import { StyleNameProduct } from './style'
 import { WrapperPriceText } from './style'
 import {StarFilled} from '@ant-design/icons'
@@ -17,12 +17,13 @@ const CardComponent = (props) => {
     navigate(`/Product-details/${id}`)
   }
   return (
-  <Card 
+  <WrapperCardStyle 
     hoverable
     style={{ width: 240 }}
     bodystyle = {{padding : '12px' }}
     cover={<img alt="example" src={image}/>}
-    onClick={() => handleDetailsProduct(id)}
+    onClick={() => countInStock !== 0 && handleDetailsProduct(id)}
+    disabled = {countInStock === 0}
     >    
       <img src = {logo}  
       style = {{width : '68px' , height : '14px' ,position : 'absolute' , top: -1 ,left : -1,
@@ -41,7 +42,7 @@ const CardComponent = (props) => {
             {discount || -5} % 
         </WrapperDiscountText>
         </WrapperPriceText>
-  </Card>
+  </WrapperCardStyle>
 )
 }
 

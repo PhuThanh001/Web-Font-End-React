@@ -1,13 +1,15 @@
 import { Card } from "antd";
 import styled from "styled-components";
 
-export const WrapperCardName = styled(Card)`
+export const WrapperCardStyle = styled(Card)`
     width : 200px;
     & img {
         height : 200px;
         width : 200px;
     },
-    postition : relation ;
+    position: relative;
+    background-color: ${props => props.disable ? '#ccc' : '#fff'};
+    cursor: ${props => props.disable ? 'not-allowed' : 'pointer'}
 `
 export const WrapperImageStyle = styled.img`
         top : -1px ;

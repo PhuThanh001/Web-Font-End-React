@@ -11,23 +11,6 @@ export const WrapperItemOrder = styled.div`
   min-height: 60px;
 `
 
-export const WrapperStyleHeaderDelivery = styled.div`
-  background: rgb(255 ,255 ,255);
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 20px;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #e0e0e0;
-  font-weight: 500;
-  min-height: 60px;
-  span {
-    color: rgb(255 ,255 ,255);
-    font-weight: 400 ;
-    font-size: 13px;
-  };
-  margin-bottom: 4px;
-`
-
 export const WrapperStyleHeader = styled.div`
   align-items: center;
   justify-content: space-between;
@@ -110,12 +93,19 @@ export const WrapperCountOrder = styled.div`
     border-radius: 4px;
 `
 export const WrapperRight = styled.div`
-    width: 320px;
-    margin-left: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+  width: 320px;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+`
+
+export const WrapperRadio = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
 `
 export const WrapperInfo = styled.div`
     padding: 17px 20px;

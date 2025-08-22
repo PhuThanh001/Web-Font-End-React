@@ -55,13 +55,17 @@ export const orderSlice = createSlice({
         state.OrderItemsSelected = itemOrderSelected
         state.orderItems = itemOrder
     },
-    removeAllOrderProduct: (state, action) => {
-        const {listCheck} = action.payload
-        const itemOrder = state?.orderItems?.filter((item) => !listCheck.includes(item?.product))
-        const itemOrderSelected = state?.OrderItemsSelected?.filter((item) => !listCheck.includes(item?.product))
-        state.OrderItemsSelected = itemOrderSelected
-        state.orderItems = itemOrder
-    },
+removeAllOrderProduct: (state, action) => {
+    const { listCheck = [] } = action.payload || {}; // ✅ đảm bảo luôn có array
+    const itemOrder = state?.orderItems?.filter(
+        (item) => !listCheck.includes(item?.product)
+    );
+    const itemOrderSelected = state?.OrderItemsSelected?.filter(
+        (item) => !listCheck.includes(item?.product)
+    );
+    state.OrderItemsSelected = itemOrderSelected || [];
+    state.orderItems = itemOrder || [];
+},
     selectOrderItems: (state, action) => {
             const {listCheck} = action.payload
             const orderSelected = []

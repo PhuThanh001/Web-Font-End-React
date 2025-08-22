@@ -30,3 +30,15 @@ export const getBase64 = (file) =>
           })
           return results
     }
+export const convertPrice = (price) => {
+  try {
+    // ép về dạng number trước
+    const numberPrice = Number(price);
+    if (isNaN(numberPrice)) return null;
+
+    const result = numberPrice.toLocaleString().replaceAll(',', '.');
+    return `${result} VND`;
+  } catch (error) {
+    return null;
+  }
+};

@@ -9,23 +9,19 @@ export const WrapperItemOrder = styled.div`
   border-bottom: 1px solid #e0e0e0;
   font-weight: 500;
   min-height: 60px;
+  justify-content: center
 `
-
-export const WrapperStyleHeaderDelivery = styled.div`
-  background: rgb(255 ,255 ,255);
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 20px;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #e0e0e0;
-  font-weight: 500;
-  min-height: 60px;
-  span {
-    color: rgb(255 ,255 ,255);
-    font-weight: 400 ;
-    font-size: 13px;
-  };
-  margin-bottom: 4px;
+export const WrapperContainer = styled.div`
+  width: 100%;
+`
+export const WrapperValue = styled.div`
+  background: rgb(240, 248, 255);
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+  margin-top: 4px;
+  color: #000;
+  margin-top: 4px;
 `
 
 export const WrapperStyleHeader = styled.div`
@@ -110,12 +106,19 @@ export const WrapperCountOrder = styled.div`
     border-radius: 4px;
 `
 export const WrapperRight = styled.div`
-    width: 320px;
-    margin-left: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+  width: 320px;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+`
+
+export const WrapperRadio = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
 `
 export const WrapperInfo = styled.div`
     padding: 17px 20px;
@@ -124,6 +127,16 @@ export const WrapperInfo = styled.div`
     border-top-right-radius: 6px;
     border-top-left-radius: 6px;
     width: 100%;
+`
+export const WrapperItemOrderInfo = styled.div`
+    padding: 17px 20px;
+    border-bottom: 1px solid #f5f5f5;
+    background: #fff;
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+    width: 100%;
+    display: flex;
+    justify-content:center;
 `
 export const WrapperTotal = styled.div`
     display: flex;

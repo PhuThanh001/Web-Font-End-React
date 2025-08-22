@@ -28,7 +28,6 @@ function App() {
   },[]);
   const handleDecoded = () => {
     let storageData = localStorage.getItem('access_token');
-    console.log('storageData:', storageData);
     let decoded = {};
       if (storageData && isjsonstring(storageData)) {
         storageData = JSON.parse(storageData);
@@ -49,7 +48,6 @@ function App() {
   });
   const handleGetDetailsUser = async (id , token) => {
     const res =  await UserService.getUserDetails(id, token);
-    console.log('res:', res);
     dispatch(updateUser({ ...res?.data, access_token: token }));
   }
   return (

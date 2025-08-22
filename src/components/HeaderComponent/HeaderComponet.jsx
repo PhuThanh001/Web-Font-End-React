@@ -66,10 +66,14 @@ const content = (
       <WrapperContentPopUp onClick={() => navigate('/System/Admin')}>
         Quản lí hệ thống
       </WrapperContentPopUp>
-    )}
+    )}    
+    <WrapperContentPopUp onClick={() => navigate('/my-order')}>  
+      Đơn Hàng Của Tôi
+    </WrapperContentPopUp>
     <WrapperContentPopUp onClick={handleLogout}>
       Đăng Xuất
     </WrapperContentPopUp>
+
   </div>
 );
   const handlerNavigationLogin = () => {
