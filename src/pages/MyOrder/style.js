@@ -10,7 +10,12 @@ export const WrapperItemOrder = styled.div`
   font-weight: 500;
   min-height: 60px;
 `
-
+export const WrapperHeaderItem = styled.div`
+`
+export const WrapperContainer = styled.div`
+    weight: 100% ;
+    background-color : #f5f5fa
+`
 export const WrapperStyleHeaderDelivery = styled.div`
   background: rgb(255 ,255 ,255);
   align-items: center;

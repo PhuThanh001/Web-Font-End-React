@@ -59,23 +59,38 @@ useEffect(() => {
 
 const content = (
   <div>
-    <WrapperContentPopUp onClick={() => navigate('/Profile-User')}>
+    <WrapperContentPopUp onClick={() => handlerClickNavigation('Profile')}>
       Thông tin người dùng
     </WrapperContentPopUp>
     {user?.isAdmin && (
-      <WrapperContentPopUp onClick={() => navigate('/System/Admin')}>
+      <WrapperContentPopUp onClick={() => handlerClickNavigation('admin')}>
         Quản lí hệ thống
       </WrapperContentPopUp>
-    )}    
-    <WrapperContentPopUp onClick={() => navigate('/my-order')}>  
+    )}
+    <WrapperContentPopUp onClick={() => handlerClickNavigation(`my-order?id = ${user?.id}&token = ${user?.access_token}`) }>
       Đơn Hàng Của Tôi
     </WrapperContentPopUp>
     <WrapperContentPopUp onClick={handleLogout}>
       Đăng Xuất
     </WrapperContentPopUp>
-
   </div>
 );
+  const handlerClickNavigation = (Type) => {
+    if(Type === 'Profile'){
+      navigate('/Profile-User')
+    }else if(Type === 'admin'){
+      navigate('/System/Admin')
+    }else if(Type === 'my-order'){
+      navigate('/my-order' , { state : {
+        id : user?.id,
+        token: user?.access_token
+      }}) 
+    }else {
+      handleLogout()
+    }
+    //SetIsOpenPopUp(false)
+  };
+
   const handlerNavigationLogin = () => {
     navigate('/signin');
   };

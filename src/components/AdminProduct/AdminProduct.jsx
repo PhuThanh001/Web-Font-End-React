@@ -31,9 +31,8 @@ const AdminProduct = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-
-  const [stateProduct , setStateProduct] = useState({
-    name: '',
+  const initial = () => ({
+      name: '',
     price:'',
     type:'',
     description:'',
@@ -42,17 +41,11 @@ const AdminProduct = () => {
     countInStock:'',
     newType:'',
     discount: ''
-  })
-  const [stateProductDetails , setStateProductDetails] = useState({
-    name: '',
-    price:'',
-    type:'',
-    description:'',
-    rating:'',
-    image:'',
-    countInStock:'',
-    discount: ''
-  })
+})
+
+  const [stateProduct , setStateProduct] = useState(initial())
+  const [stateProductDetails , setStateProductDetails] = useState(initial())
+
   const mutation = useMutationHook((data) => {
     const {
       name ,
@@ -136,15 +129,21 @@ const AdminProduct = () => {
   } 
   console.log('stateProduct' , stateProductDetails)
   useEffect(() => {
-    form.setFieldsValue(stateProductDetails)
-  }, [form , stateProductDetails] )
+    if(!isModalOpen){
+      form.setFieldsValue(initial())
+    }else {
+      form.setFieldsValue(initial())
+
+    }
+  }, [form , stateProductDetails ,isModalOpen] )
   
   useEffect(() => 
     {
-      if(rowSelected) {
+      if(rowSelected && isOpenDraw) {
+        SetIsLoadingUpdate(true)
         fetchGetDetailsProduct(rowSelected)
       }
-    }, [rowSelected])  
+    }, [rowSelected ,isOpenDraw])  
 
   console.log('StateProduct' , stateProductDetails)
   const handleDetailsProduct = () => {
