@@ -196,10 +196,19 @@ useEffect(() => {
   return order?.OrderItemsSelected?.reduce((total, item) => total + item.price * item.amount, 0) || 0;
 }, [order]);
 
+// const discountMemo = useMemo(() => {
+//   return order?.OrderItemsSelected?.reduce((total, item) => total + item.discount * item.amount, 0) || 0;
+// }, [order]);
 const discountMemo = useMemo(() => {
-  return order?.OrderItemsSelected?.reduce((total, item) => total + item.discount * item.amount, 0) || 0;
+const result =  order?.OrderItemsSelected?.reduce((total, cur) => {
+    const totalDiscount = cur.discount ? cur.discount : 0; 
+    return total + (priceMemo * (totalDiscount * cur.amount) / 100);
+  }, 0)
+  if(Number(result)) {
+    return result
+  }
+  return 0;
 }, [order]);
-
 const deliveryPriceMemo = useMemo(() => {
   return priceMemo > 200000 ? 10000 : 20000;
 }, [priceMemo]);

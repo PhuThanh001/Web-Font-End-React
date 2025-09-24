@@ -12,6 +12,7 @@ import ProductDetailsPage from '../pages/ProductPageDetail/ProductDetailsPage'
 import PaymentPage from '../pages/PaymentPage/PaymentPage'
 import OrderSuccessPage from '../pages/OrderSuccess/OrderSuccessPage'
 import MyOrder from '../pages/MyOrder/MyOrder'
+import DetailsOrderPage from '../pages/DetailsOrderPage/DetailsOrderPage'
 
 export const routes = [
     {
@@ -23,7 +24,11 @@ export const routes = [
       path :'/product',
       page : ProductPage,
       isShowHeader : true
-
+    },
+    {
+      path :'/details-order/:id',
+      page : DetailsOrderPage,
+      isShowHeader : true
     },
     {
       path : '/order',
@@ -36,7 +41,7 @@ export const routes = [
       isShowHeader : true
     },
     {
-      path : '/myorder',
+      path : '/my-order',
       page : MyOrder,
       isShowHeader : true
     },

@@ -30,6 +30,9 @@ export const orderSlice = createSlice({
             state.orderItems.push(orderItem)
         }
     },
+    resetOrder: (state) => {
+      state.isSuccessOrder = false
+    },
     increaseAmount:(state , action) => {
       const {idProduct} = action.payload
       const itemProduct = state?.orderItems?.find((item) => item?.product === idProduct)
@@ -79,7 +82,7 @@ removeAllOrderProduct: (state, action) => {
   },
 });
 // Export action
-export const { addOrderProduct ,increaseAmount ,decreaseAmount ,removeOrderProduct , removeAllOrderProduct , selectOrderItems } = orderSlice.actions;
+export const { addOrderProduct ,increaseAmount ,decreaseAmount ,removeOrderProduct , removeAllOrderProduct , selectOrderItems , resetOrder } = orderSlice.actions;
 
 // Export reducer
 export default orderSlice.reducer;

@@ -49,22 +49,28 @@ const OrderPage = () => {
     //         setListCheck([...listCheck, e.target.value])
     //     }
     // }
-const onChange = (e) => {
-  const value = e.target.value;
-  if (listCheck.includes(value)) {
-    setListCheck(listCheck.filter(item => item !== value));
-  } else {
-    setListCheck([...listCheck, value]);
-  }
-};
-    const handleChangeCount = (type, idProduct) => {
+    const onChange = (e) => {
+    const value = e.target.value;
+    if (listCheck.includes(value)) {
+        setListCheck(listCheck.filter(item => item !== value));
+    } else {
+        setListCheck([...listCheck, value]);
+    }
+    };
+
+    const handleChangeCount = (type, idProduct , limited) => {
         console.log('type' , type , 'idProduct' , idProduct)
         if (type === 'increase') {
+            if(!limited) {
             dispatch(increaseAmount({idProduct}))
+            }
         }else {
-            dispatch(decreaseAmount({idProduct}))
+            if(!limited){
+                dispatch(decreaseAmount({idProduct}))
+            }
         }
     }
+
     const handleChangeCheckAll = (e) => {
         if(e.target.checked) {
             const newListCheck = []
@@ -155,9 +161,15 @@ const onChange = (e) => {
        return result
 }, [order]); 
 const discountMemo = useMemo(() => {
-  return order?.OrderItemsSelected?.reduce((total, item) => total + item.discount * item.amount, 0) || 0;
+const result =  order?.OrderItemsSelected?.reduce((total, cur) => {
+    const totalDiscount = cur.discount ? cur.discount : 0; 
+    return total + (priceMemo * (totalDiscount * cur.amount) / 100);
+  }, 0)
+  if(Number(result)) {
+    return result
+  }
+  return 0;
 }, [order]);
-
 const deliveryPriceMemo = useMemo(() => {
   if (priceMemo > 200000 && priceMemo < 500000){
     return 10000 
@@ -171,7 +183,7 @@ const deliveryPriceMemo = useMemo(() => {
 }, [priceMemo]);
 
 const totalPriceMemo = useMemo(() => {
-  return priceMemo + deliveryPriceMemo - discountMemo;
+  return priceMemo + deliveryPriceMemo - discountMemo ;
 }, [priceMemo, deliveryPriceMemo, discountMemo]);
 
 const ItemsDelivery = [
@@ -189,6 +201,7 @@ const ItemsDelivery = [
         description:'Trên 500000VND',
     }
 ]
+console.log('đơn hàng' , order)
     return (
         <div style={{background: '#f5f5f5',width: '100%', height: '100vh'}}> 
         <div style={{height: '100%', width: '1270px', margin: '0 auto'}}>
@@ -252,15 +265,14 @@ const ItemsDelivery = [
                         <div style={{width: '120px', display: 'flex', justifyContent:'center' ,marginLeft: '100px'}}>
                             <WrapperCountOrder>
                             <button onClick={() => handleChangeCount('decrease', order.product)} style={{border: 'none', background: 'none', cursor: 'pointer'}}>
-                                <MinusOutlined style={{ color :'#000' ,fontSize :'10px'}}/>
+                                <MinusOutlined style={{ color :'#000' ,fontSize :'10px'}}  />
                             </button>
-                            <WrapperInputNumber value={order.amount} size="small" readOnly />
-                            <button onClick={() => handleChangeCount('increase', order.product)} style={{border: 'none', background: 'transparent', cursor: 'pointer'}}>
-                                <PlusOutlined style={{ color: '#000', fontSize: '10px' }} />
+                            <WrapperInputNumber value={order.amount} size="small" readOnly min={1} max={order.countInStock}/>
+                            <button onClick={() => handleChangeCount('increase', order?.product , order?.amount === order?.countInStock) } style={{border: 'none', background: 'transparent', cursor: 'pointer'}}>
+                                <PlusOutlined style={{ color: '#000', fontSize: '10px' }} min={1} max={order.countInStock}/>
                             </button>
                             </WrapperCountOrder>
                         </div>
-
                         {/* thành tiền */}
                         <div>
                         <div style={{width:'120px', textAlign:'center', color:'rgb(255,66,78)', marginRight: '16px', fontWeight:500}}>

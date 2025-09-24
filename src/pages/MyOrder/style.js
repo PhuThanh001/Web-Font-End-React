@@ -2,7 +2,7 @@ import { Col ,InputNumber } from "antd"
 import styled from "styled-components"
 
 export const WrapperItemOrder = styled.div`
-  display: flex;            
+  display: center;            
   align-items: center;
   padding: 15px 20px;
   background-color: #f9f9f9;
@@ -11,6 +11,73 @@ export const WrapperItemOrder = styled.div`
   min-height: 60px;
 `
 export const WrapperHeaderItem = styled.div`
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+
+  img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border: 1px solid rgb(238, 238, 238);
+    padding: 2px;
+    border-radius: 4px;
+  }
+
+  div {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    color: #333;
+  }
+
+  span {
+    font-size: 13px;
+    color: #242424;
+    font-weight: 500;
+    margin-left: auto;
+  }
+`;
+
+export const WrapperStatus = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
+
+  span {
+    font-size: 14px;
+    color: #333;
+  }
+
+  div {
+    font-size: 13px;
+    color: #555;
+
+    span {
+      color: rgb(255, 66, 78);
+      font-weight: 500;
+      margin-right: 6px;
+    }
+  }
+`;
+
+export const WrapperFooterItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: right;
+  padding: 12px;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fff;
+
+
 `
 export const WrapperContainer = styled.div`
     weight: 100% ;

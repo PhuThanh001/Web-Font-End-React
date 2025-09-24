@@ -3,60 +3,83 @@ import { useSelector } from 'react-redux'
 import Loading from '../../components/LoadingComponent/loading'
 import * as OrderService from '../../service/OrderService';
 import { useQuery } from '@tanstack/react-query'
-import { WrapperItemOrder, WrapperListOrder , WrapperHeaderItem ,WrapperContainer} from './style';
+import { useMutationHook } from '../../hooks/useMutationHook'
+import { WrapperItemOrder, WrapperListOrder , WrapperHeaderItem ,WrapperContainer,WrapperStatus,WrapperFooterItem  } from './style';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { WrapperHeader } from '../ProfilePage/style';
 import SizeContext from 'antd/es/config-provider/SizeContext';
 import { convertPrice } from '../../utils';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 
-
-
-const OrderPage = () => {
+const MyOrder = () => {
     const location = useLocation() 
     const {state} = location
     const navigate = useNavigate()
+    console.log('id va accessTokeb' , state?.id , state?.token)
     const fetchMyOrder = async () => {
-        const res = await OrderService.getOrderByUserId(state?.id ,state?.AccessToken)
+        const res = await OrderService.getOrderbyUserId(state?.id , state?.token)
+        console.log('data tra ve:', res.data)
         return res.data
     }
-
     const queryOrder = useQuery({
-        queryKey: ['user'],
+        queryKey: ['order' , state?.id],
         queryFn: fetchMyOrder,
-        enabled: !!(state?.id && state?.AccessToken)
+        enabled: !!(state?.id && state?.token)
     })
+      const mutation = useMutationHook(async (data) => {
+        const {
+          id ,
+          token,
+        orderItems
+        } = data
+        const res = await OrderService.CancelOrder(
+          id, token , orderItems)
+        return res
+      },
+    )
+    console.log('queryOrder', queryOrder)
     const {isLoading , data } = queryOrder
     const handleDetailsOrder = (id) => {
         navigate(`/details-order/${id}`)
-    } 
+    }
+     const handleCancelOrder = (order) => {
+        mutation.mutate({id : order._id , token : state?.token , orderItems : order?.orderItems},
+            {onSuccess: (data) => {
+                console.log('huy don hang thanh cong' , data)
+                queryOrder.refetch()}
+            }
+        )
+    }
+    console.log('du lieu render' , data)
     const renderProduct = (data) => {
         return data?.map((order) => {
-            return <WrapperHeaderItem>
+            return ( 
+            <WrapperHeaderItem>
                             <img src={order?.image} 
                             style=
                             {{
                                 width:'70px',
                                 height: '70px',
                                 objectFit: 'cover',
-                                border: '1px sold rgb(238,238,238)',
-                                pading: '2px'
+                                border: '1px solid rgb(238,238,238)',
+                                padding: '2px'
                             }}>
                             </img>
                             <div style={{
-                                width: '10px',
+                                maxWidth: '120px',
                                 overflow: 'hidden',
+                                flexDirection: 'column',
                                 textOverflow: 'ellipsis',
                                 whiteSpace:'nowrap',
                                 marginLeft:'10px'
                             }}>
                             {order?.name}
                             </div>
-                            <span style={{ fontSize:'13px' , color:'#242424' , marginLeft:'auto'}}>{convertPrice(order?.price)}</span>
+                            <span style={{ fontSize:'13px' , color:'#242424' , marginLeft:'auto' ,display :'block' , textAlign:'right' }}>{convertPrice(order?.price)}</span>
             </WrapperHeaderItem>
+            )
         }
     )}
-
     return (
         <Loading isPending={isLoading}>
         <WrapperContainer>
@@ -78,38 +101,43 @@ const OrderPage = () => {
                         </WrapperStatus>
                         {renderProduct(order?.orderItems)}
                         <WrapperFooterItem>
-                            <div>
-                                <span style={{color: 'rgb(256,66 ,78)'}}> Tổng Tiền</span>
-                                <span style={{
-                                    fontSize:'14px' , fontWeight:'14px' , color:'rgb(56 ,56, 61)'
-                                }}
-                                >{convertPrice(order?.totalPrice)}</span>
-                            </div>
-                            <div style={{display: 'flex' , gap:'10px'}}>
-                                <ButtonComponent
-                                    size={40} 
-                                    StypeButton={{
-                                        height:'36px',
-                                    }}
-                                    TextButton={'Hủy đơn hàng'}
-                                    StypeTextButton={{
-                                        color: 'rgb(11 , 116 ,229)',
-                                        fontSize:'14px'
-                                    }}
-                                ></ButtonComponent>
-                                <ButtonComponent
-                                    onclick={() => handleDetailsOrder(order?.id)}
-                                    size={40} 
-                                    StypeButton={{
-                                        height:'36px',
-                                    }}
-                                    TextButton={'Xem chi tiết'}
-                                    StypeTextButton={{
-                                        color: 'rgb(11 , 116 ,229)',
-                                        fontSize:'14px'
-                                    }}
-                                ></ButtonComponent>
-                            </div>
+<div style={{ 
+    display: 'flex',        // dùng flex để dễ căn chỉnh
+    flexDirection: 'column', // sắp xếp theo cột (chồng lên nhau)
+    alignItems: 'flex-end', // căn trái
+    width: '100%'     // chỉ chiếm theo nội dung
+}}>
+    <div>                                
+        <span style={{color: 'rgb(256,66 ,78)', display: 'block', textAlign:'left'}}> Tổng Tiền</span>
+        <span style={{
+            fontSize:'14px', fontWeight:'14px', color:'rgb(56 ,56, 61)', display:'block', textAlign:'left'
+        }}
+        >{convertPrice(order?.totalPrice)}</span>
+    </div>
+
+    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+        <ButtonComponent
+            onClick={() => handleCancelOrder(order)}
+            size={40} 
+            StypeButton={{ height:'36px' }}
+            TextButton={'Hủy đơn hàng'}
+            StypeTextButton={{
+                color: 'rgb(11 , 116 ,229)',
+                fontSize:'14px'
+            }}
+        />
+        <ButtonComponent
+            onClick={() => handleDetailsOrder(order?._id)}
+            size={40} 
+            StypeButton={{ height:'36px' }}
+            TextButton={'Xem chi tiết'}
+            StypeTextButton={{
+                color: 'rgb(11 , 116 ,229)',
+                fontSize:'14px'
+            }}
+        />
+    </div>
+</div>
                         </WrapperFooterItem>
                     </WrapperItemOrder>
                 )
@@ -119,7 +147,6 @@ const OrderPage = () => {
          </div>    
          </WrapperContainer>
          </Loading>
-        
     )
 }
-export default OrderPage;
+export default MyOrder;

@@ -1,10 +1,12 @@
 import React from 'react'
 import  { useState } from 'react'
-import { AppstoreOutlined, MailOutlined, ProductOutlined, SettingOutlined, UserOutlined  } from '@ant-design/icons';
+import { AppstoreOutlined, MailOutlined, ProductOutlined, SettingOutlined, UserOutlined ,OrderedListOutlined  } from '@ant-design/icons';
 import { Menu } from 'antd';
 import HeaderComponent from '../../components/HeaderComponent/HeaderComponet';
 import AdminProduct from '../../components/AdminProduct/AdminProduct';
 import AdminUser from '../../components/AdminUser/AdminUser';
+import AdminOrder from '../../components/OrderAdmin/OrderAdmin';
+
 const AdminPage = () => {
   const items = [
   {
@@ -16,6 +18,11 @@ const AdminPage = () => {
     key: 'product',
     icon: <ProductOutlined />,
     label: 'Sản Phẩm',
+  },
+    {
+    key: 'order',
+    icon: <OrderedListOutlined />,
+    label: 'Đơn Hàng',
   },
   {
     key: '3',
@@ -69,7 +76,11 @@ const getLevelKeys = items1 => {
       case 'product':
         return (
           <AdminProduct/>
-        )
+      );
+      case 'order':
+        return (
+          <AdminOrder/>
+        );
       default:
         <></>
     }

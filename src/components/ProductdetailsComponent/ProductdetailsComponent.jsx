@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Row ,Col ,Image, Input, InputNumber, Button, Flex, Rate } from 'antd'
+import React, { useEffect, useState , useMemo } from 'react'
+import { Row ,Col ,Image, Input, InputNumber, Button, Flex, Rate, message } from 'antd'
 import ImageProduct from '../../assets/image/ImageProduct.png'
 import SmallImage from '../../assets/image/smallImage.webp'
 import { WrapperInputNumber, WrapperPriceProduct, WrapperQualityProduct, WrapperStyleColImage, WrapperStyleImageSmall, WrapperStyleTextSell } from './Style'
@@ -14,14 +14,21 @@ import { useQuery } from '@tanstack/react-query'
 import Loading from '../LoadingComponent/loading';
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { addOrderProduct } from '../../redux/slides/orderSlide'
+import { addOrderProduct ,resetOrder } from '../../redux/slides/orderSlide'
 import { convertPrice } from '../../utils'
+import LikeButtonComponent from '../LikeButtonComponent/LikeButtonComponent'
+import CommentComponent from '../CommentComponent/CommentComponent'
+import { meta } from '@eslint/js'
+
+
 
 
 const ProductdetailsComponent = ({idProduct}) => {
         
         const [numProduct ,setNumProduct] = useState(1)
         const user = useSelector((state) => state.user)
+        const order = useSelector((state) => state.order)
+        const [errorLimitOrder ,setErrorLimitOrder] = useState(false)
         const navigate = useNavigate()
         const location = useLocation()
         const dispatch = useDispatch()
@@ -37,35 +44,80 @@ const ProductdetailsComponent = ({idProduct}) => {
                         setNumProduct(numProduct - 1)
                 }
         }
+
         const fetchGetDetailsProduct = async (context) =>{
             const id = context?.queryKey && context?.queryKey[1]
             const res = await ProductService.GetDetailsProduct(id)
+            console.log('first', res)
             return res?.data
-        }         
+        }                 
         const { isLoading, data: productDetails, isPreviousdata } = useQuery({
                 queryKey: ['products-details',idProduct],
                 queryFn: fetchGetDetailsProduct,
                 enabled: !!idProduct
         });
+        console.log('productDetails' , productDetails)
+        // useEffect(() => {
+        //         const orderRedux = order?.orderItems?.find(item => item.product === productDetails?._id)
+        //         if((orderRedux?.amount +  numProduct) <= orderRedux?.countInStock || (!orderRedux && productDetails.countInStock > 0)){
+        //                 setErrorLimitOrder(false)
+        //         }else{
+        //                 setErrorLimitOrder(true)
+        //         }
+        // }, [numProduct])
+        useEffect(() => {
+                
+        } ,[])
+        useEffect(() => {
+                if (!productDetails) return; // chặn khi chưa có dữ liệu
+
+                const orderRedux = order?.orderItems?.find(item => item.product === productDetails?._id)
+
+                if ((orderRedux?.amount + numProduct) <= orderRedux?.countInStock ||
+                        (!orderRedux && productDetails?.countInStock > 0)) {
+                        setErrorLimitOrder(false)
+                } else {
+                        setErrorLimitOrder(true)
+                }
+        }, [numProduct, productDetails, order])
+
+        useEffect(() => {
+                if(order.isSuccessOrder) {
+                        message.success('đã thêm vào giỏ hàng')
+                }
+                return () => {
+                        dispatch(resetOrder())
+                }
+        }, [order?.isSuccessOrder])
+
         const handleAddOrderProduct = async () => {
                 if(!user?.id){
                         navigate('/SignIn' ,  {state : location?.pathname}) 
                 }else{
+                        console.log('add order product' , productDetails)
+                        const orderRedux = order?.orderItems?.find(item => item.product === productDetails?._id)
+                        console.log('first' , orderRedux , numProduct)
+                        if((orderRedux?.amount +  numProduct) <= orderRedux?.countInStock || !orderRedux && productDetails.countInStock > 0){
                         dispatch(addOrderProduct({
                                 orderItem: {
                                         name: productDetails.name,
                                         amount: numProduct,
                                         image: productDetails.image,
                                         price: productDetails.price,
-                                        product: productDetails?._id
+                                        product: productDetails?._id,
+                                        discount: productDetails?.discount || 0,
+                                        countInStock: productDetails?.countInStock || 0,
                                 }
                         }))
+                } else {
+                        setErrorLimitOrder(true)
                 }
         }
+}
         console.log('productDetails' , productDetails , user)
         return (
                 <Loading isPending={isLoading}>
-                <Row style={{backgroundColor : '#fff' , padding : '16px' ,borderRadius : '4px'}} >
+                <Row className='rowww' style={{backgroundColor : '#fff' , padding : '16px' ,borderRadius : '4px'}} >
         <Col span={10} style={{ borderRight : '1px solid #e5e5e5' ,paddingLeft : '8px' }}>
                 <Image  src={productDetails?.Image} alt="Image Product"  preview = {false}/>
                 <Row>
@@ -93,6 +145,7 @@ const ProductdetailsComponent = ({idProduct}) => {
                                 <span className='address'> {user?.address}</span>
                                 <span className='Change-address'> Đổi địa chỉ</span>
                         </WrapperAddressProduct>
+                         <LikeButtonComponent dataHref={import.meta.env.VITE_APP_IS_LOCAL ? "https://developers.facebook.com/docs/plugins/" : window.location.href} /> 
                         <div>
                                 
                                 <div style={{ margin : '10px 0 20px',padding : '10px 0' ,borderTop : '1px solid #ccc' , borderBottom : '1px solid #ccc'}}> 
@@ -121,7 +174,7 @@ const ProductdetailsComponent = ({idProduct}) => {
                                                 border : 'none' ,
                                                 borderRadius : '4px'
                                          }}
-                                         textButton ={ 'Chọn mua'}
+                                         TextButton ={ 'Chọn mua'}
                                          styleTextButton = {{ color : '#efefef' , fontSize : '15px', fontWeight : '700'}}
                                          onClick={handleAddOrderProduct}  >
                                 </ButtonComponent>
@@ -135,14 +188,20 @@ const ProductdetailsComponent = ({idProduct}) => {
                                                 borderRadius : '4px',
                                                 marginleft : '12px'
                                          }}
-                                         textButton ={ 'Mua trả sau lãi suất 5%'}
+                                         TextButton ={ 'Mua trả sau lãi suất 5%'}
                                          styleTextButton = {{ color : '#efefef'  ,fontSize : '15px', fontWeight : '700'}}>
                                 </ButtonComponent>
                                 </div>
         </Col>
+
+  <Col span={24} style={{ marginTop: '20px' }}>
+    <CommentComponent
+      dataHref={import.meta.env.VITE_APP_IS_LOCAL ? "https://developers.facebook.com/docs/plugins/comments#configurator" : window.location.href}
+      dataWidth="100%"   
+    />
+  </Col>
         </Row>  
         </Loading>
-        )
-        
+        )       
 }
 export default ProductdetailsComponent
