@@ -144,7 +144,21 @@ const AdminProduct = () => {
         fetchGetDetailsProduct(rowSelected)
       }
     }, [rowSelected ,isOpenDraw])  
-
+      useEffect(() => {
+        if (stateProductDetails) {
+          form.setFieldsValue({
+            name: stateProductDetails.name,
+            type: stateProductDetails.type,
+            countInStock: stateProductDetails.countInStock,
+            price: stateProductDetails.price,
+            rating: stateProductDetails.rating,
+            description: stateProductDetails.description,
+            discount: stateProductDetails.discount,
+            image: stateProductDetails.image,
+          });
+        }
+      }, [stateProductDetails, form])
+      
   console.log('StateProduct' , stateProductDetails)
   const handleDetailsProduct = () => {
       if(rowSelected) {
@@ -433,7 +447,7 @@ const getColumnSearchProps = dataIndex => ({
   console.log('user' , user)
   console.log('rowsellll' , rowSelected)
   console.log('stateproduccc' , stateProductDetails)
-  const OnUpdateProduct = () => {
+  const OnUpdateProduct = (stateProductDetails) => {
       mutationUpdate.mutate({id: rowSelected , token : user?.access_token , ...stateProductDetails} , 
         {onSettled: () => {
             queryProduct.refetch()
@@ -640,7 +654,7 @@ const typeList = TypeProduct?.data?.data?.data || [];
         </Form>
         </Loading>
       </Modal>
-      <DrawComponent title='chi tiết sản phẩm' isopen={isOpenDraw} onClose={() => SetIsOpenDraw(false)} width="90%" >
+      {/* <DrawComponent title='chi tiết sản phẩm' isopen={isOpenDraw} onClose={() => SetIsOpenDraw(false)} width="90%" >
                   <Loading isPending={isLoadingUpdate}>
         <Form
           name="basic"
@@ -728,7 +742,114 @@ const typeList = TypeProduct?.data?.data?.data || [];
             </Button>
           </Form.Item>
         </Form></Loading>
-      </DrawComponent>
+      </DrawComponent> */}
+<DrawComponent 
+  title='Chi tiết sản phẩm' 
+  isopen={isOpenDraw} 
+  onClose={() => SetIsOpenDraw(false)} 
+  width="90%" 
+>
+  <Loading isPending={isLoadingUpdate}>
+    <Form
+      name="basic"
+      labelCol={{ span: 2 }}
+      wrapperCol={{ span: 22 }}
+      style={{ maxWidth: 600 }}
+      onFinish={OnUpdateProduct}
+      autoComplete="on"
+      form={form}
+    >
+      {/* Khi stateProductDetails thay đổi -> update lại form */}
+
+      <Form.Item
+        label="Name"
+        name="name"
+        rules={[{ required: true, message: 'Please input product name!' }]}
+      >
+        <InputComponent />
+      </Form.Item>
+
+      <Form.Item
+        label="Type"
+        name="type"
+        rules={[{ required: true, message: 'Please input product type!' }]}
+      >
+        <InputComponent /> 
+      </Form.Item>
+
+      <Form.Item
+        label="Count In Stock"
+        name="countInStock"
+        rules={[{ required: true, message: 'Please input stock count!' }]}
+      >
+        <InputComponent /> 
+      </Form.Item>
+
+      <Form.Item
+        label="Price"
+        name="price"
+        rules={[{ required: true, message: 'Please input product price!' }]}
+      >
+        <InputComponent /> 
+      </Form.Item>
+      <Form.Item
+        label="Rating"
+        name="rating"
+        rules={[{ required: true, message: 'Please input rating!' }]}
+      >
+        <InputComponent /> 
+      </Form.Item>
+      <Form.Item
+        label="Description"
+        name="description"
+        rules={[{ required: true, message: 'Please input description!' }]}
+      >
+        <InputComponent /> 
+      </Form.Item>
+
+      <Form.Item
+        label="Discount"
+        name="discount"
+        rules={[{ required: true, message: 'Please input discount!' }]}
+      >
+        <InputComponent /> 
+      </Form.Item>
+
+      <Form.Item
+        label="Image"
+        name="image"
+        rules={[{ required: true, message: 'Please input image!' }]}
+      >
+        <WrapperUpLoadFile 
+          onChange={handleOnchangeAvatarDetails} 
+          maxCount={1} 
+          beforeUpload={() => false}
+        >
+          <Button>Select File</Button>
+          {stateProductDetails?.image && (
+            <img
+              src={stateProductDetails.image}
+              style={{
+                height: '60px',
+                width: '60px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                marginLeft: '10px'
+              }}
+              alt="avatar"
+            />
+          )}   
+        </WrapperUpLoadFile>       
+      </Form.Item>
+
+      <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
+        <Button type="primary" htmlType="submit">
+          Apply
+        </Button>
+      </Form.Item>
+    </Form>
+  </Loading>
+</DrawComponent>
       <ModalComponent
         title="Xóa Sản Phẩm"
         closable={{'aria-label': 'Custom Close Button' }}

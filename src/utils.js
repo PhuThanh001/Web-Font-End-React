@@ -42,3 +42,29 @@ export const convertPrice = (price) => {
     return null;
   }
 };
+export const initFacebookSdk = () => {
+    // Nếu đã có FB rồi thì resolve luôn
+    if (window.FB) {
+      window.FB.XFBML.parse();
+    }
+    let locale = 'vi_VN'; // đặt mặc định là tiếng việt
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: import.meta.env.VITE_APP_FB_ID, // thay bằng appId của bạn
+        cookie: true,
+        xfbml: true,
+        version: 'v18.0', // Update to the latest version if needed
+      });
+    };
+
+    (function (d, s, id) {
+      var js,
+        fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://connect.facebook.net/" + locale + "/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, "script", "facebook-jssdk");
+  
+};

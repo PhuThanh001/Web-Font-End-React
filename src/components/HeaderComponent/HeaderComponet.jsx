@@ -32,7 +32,7 @@ useEffect(() => {
   const fetchProfile = async () => {
     if (user?.access_token) {
       try {
-        const res = await UserService.getDetailsUser(user.id, user.access_token);
+        const res = await UserService.getUserDetails(user._id, user.access_token);
         const profile = res?.data;
 
         if (profile) {
@@ -46,8 +46,9 @@ useEffect(() => {
       }
     }
   };
-
-  fetchProfile();
+console.log('Thông tin User' , user._id , user.access_token)
+  
+fetchProfile();
 }, [user?.access_token]);
 useEffect(() => {
   setIsLoading(true);
@@ -67,7 +68,7 @@ const content = (
         Quản lí hệ thống
       </WrapperContentPopUp>
     )}
-    <WrapperContentPopUp onClick={() => handlerClickNavigation(`my-order?id = ${user?.id}&token = ${user?.access_token}`) }>
+    <WrapperContentPopUp onClick={() => handlerClickNavigation(`my-order`) }>
       Đơn Hàng Của Tôi
     </WrapperContentPopUp>
     <WrapperContentPopUp onClick={handleLogout}>
@@ -75,6 +76,7 @@ const content = (
     </WrapperContentPopUp>
   </div>
 );
+
   const handlerClickNavigation = (Type) => {
     if(Type === 'Profile'){
       navigate('/Profile-User')
@@ -82,7 +84,7 @@ const content = (
       navigate('/System/Admin')
     }else if(Type === 'my-order'){
       navigate('/my-order' , { state : {
-        id : user?.id,
+        id : user?._id,
         token: user?.access_token
       }}) 
     }else {
@@ -107,7 +109,12 @@ const content = (
         <WrapperHeader style={{ justifyContent: isHiddenSearch && isHiddentCart ? 'space-between' : 'unset' }}>
           <Row align="middle">
             <Col span={6}>
-              <WrapperTextHeader>Laptrinhquade</WrapperTextHeader>
+              <WrapperTextHeader
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate('/')}
+              >
+                Laptrinhquade
+              </WrapperTextHeader>
             </Col>
             {!isHiddenSearch && (
               <Col span={13}>
