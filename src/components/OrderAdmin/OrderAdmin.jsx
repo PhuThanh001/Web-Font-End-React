@@ -16,7 +16,7 @@ import * as OrderService  from '../../service/OrderService';
 import imageCompression from 'browser-image-compression';
 import { orderContant } from '../../contant';
 import { Excel } from 'antd-table-saveas-excel';
-import PieChartComponent from './piechart';
+import PieChartComponent from './Piechart';
 
 
 
