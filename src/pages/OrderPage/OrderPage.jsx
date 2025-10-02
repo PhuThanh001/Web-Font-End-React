@@ -1,5 +1,6 @@
-import { Checkbox, Result ,Form, message ,Button } from 'antd'
+import { Checkbox, Result ,Form, message ,Button , InputNumber } from 'antd'
 import React, { use, useMemo } from 'react'
+import { ShoppingCartOutlined , CarOutlined , CheckCircleOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector , } from 'react-redux'
 import { Fragment, useEffect, useState } from 'react'
 import { WrapperLeft ,WrapperStyleHeader ,WrapperListOrder ,WrapperItemOrder ,WrapperInfoSection, RowInfo,WrapperTotalSection ,WrapperCountOrder ,WrapperInputNumber, WrapperInfo, WrapperTotal,WrapperRights, WrapperStyleHeaderDelivery } from './style'
@@ -21,6 +22,7 @@ import StepComponent from '../../components/StepComponent/StepComponent'
 const OrderPage = () => {
     const order = useSelector((state) => state.order)
     const user = useSelector((state) => state?.user)
+    console.log("user" , user)
     const [form] = Form.useForm();
     const [isModalOpenUpdate, setIsModalOpenUpdate] = useState(false)
       const [stateUserDetails , setStateUserDetails] = useState({
@@ -90,7 +92,8 @@ const OrderPage = () => {
     }
     const handleDeleteAllItem = () => {
         if(listCheck.length === order?.orderItems?.length) {
-            dispatch(removeAllOrderProduct(listCheck))}
+            dispatch(removeAllOrderProduct({listCheck}))
+            }
     }
     const handleAddCart = () => {
         if(!user?.phone || !user?.address || !user?.name || !user?.city) {
@@ -102,7 +105,6 @@ const OrderPage = () => {
         }
     }
   const mutationUpdate = useMutationHook(async (data) => {
-    console.log('data' , data)
     const {
       id ,
       token,
@@ -145,7 +147,7 @@ const OrderPage = () => {
         form.setFieldsValue(stateUserDetails)
     }, [form, stateUserDetails])
     useEffect(() => {
-        if(setIsModalOpenUpdate) {
+        if(isModalOpenUpdate) {
             setStateUserDetails({
                 ...stateUserDetails,
                 name: user?.name,
@@ -187,28 +189,28 @@ const totalPriceMemo = useMemo(() => {
 }, [priceMemo, deliveryPriceMemo, discountMemo]);
 
 const ItemsDelivery = [
-    {
-        title:'20000VND',
-        description:'Dưới 200.000VND', 
-        
-    },
-    {
-        title:'10.000VND',
-        description:'Từ 200.000VND tới 500.000VND',
-    },
-    {
-        title:'0 VND',
-        description:'Trên 500000VND',
-    }
-]
-console.log('đơn hàng' , order)
+  {
+    title: "20000VND",
+    description: "Dưới 200.000VND",
+  },
+  {
+    title: "10.000VND",
+    description: "Từ 200.000VND tới 500.000VND",
+  },
+  {
+    title: "0 VND",
+    description: "Trên 500000VND",
+  },
+];
+
+
     return (
         <div style={{background: '#f5f5f5',width: '100%', height: '100vh'}}> 
         <div style={{height: '100%', width: '1270px', margin: '0 auto'}}>
             <h3>giỏ hàng</h3>
             <div style={{display: 'flex', justifyContent: 'center'}}>
                 <WrapperLeft>
-                <WrapperStyleHeaderDelivery>
+                <WrapperStyleHeaderDelivery className='header-delivery'>
                     <StepComponent  items={ItemsDelivery} current={
                                 deliveryPriceMemo === 20000
                                     ? 0
@@ -220,22 +222,33 @@ console.log('đơn hàng' , order)
   }
   ></StepComponent>
                 </WrapperStyleHeaderDelivery>
-                    <WrapperStyleHeader>
+                    <WrapperStyleHeader >
                         <span style={{display: 'inline-block', width: '390px'}}>
                             <Checkbox  onChange={handleChangeCheckAll} checked={(Array.isArray(listCheck) ? listCheck.length : 0) === order?.orderItems?.length} />
                                 <span> Chọn tất cả ({order?.orderedItems?.length} sản phẩm ) </span>
                         </span>
-                        <div style={{flex:1 , display: 'flex',justifyContent: 'center',alignItems: 'center'}}>
-                            <span style={{marginRight: '100px'}}>số lượng</span>
-                            <span style={{marginRight: '100px'}}>đơn giá</span>
-                            <span style={{marginRight: '100px'}}>Thành tiền</span>
-                            <DeleteOutlined style={{cursor: 'pointer'}} onClick={handleDeleteAllItem} />
-                        </div>
+                        {/* <div style={{flex:1 , display: 'flex',justifyContent: 'center',alignItems: 'center'}}> */}
+                            {/* Đơn giá */}
+                            <div style={{ textAlign: "center" }}>Đơn giá</div>
+
+                            {/* Số lượng */}
+                            <div style={{ textAlign: "center" }}>Số lượng</div>
+
+                            {/* Thành tiền */}
+                            <div style={{ textAlign: "center" }}>Thành tiền</div>
+                            {/* Delete */}
+                            <div style={{ textAlign: "center" }}>
+                                <DeleteOutlined
+                                    style={{ cursor: "pointer" }}
+                                    onClick={handleDeleteAllItem}
+                                />
+                                
+                            </div>                        {/* </div> */}
                     </WrapperStyleHeader>
                     <WrapperListOrder>
                         {order?.orderItems?.map((order) => {
                             return (
-                                <WrapperItemOrder key={order.product}>
+                    <WrapperItemOrder key={order.product}>
                         <div style={{width: '390px', display: 'flex', alignItems: 'center'}}>
                             <Checkbox onChange={onChange} value={order.product} checked={Array.isArray(listCheck) && listCheck.includes(order.product)} />
                             <img src={order.image} style={{width: '50px', height: '50px', objectFit: 'cover', marginLeft: '6px'}}/>
@@ -256,29 +269,50 @@ console.log('đơn hàng' , order)
                         </div>
 
                         {/* đơn giá */}
-                        {console.log('order.price' , order.price)}
-                        <div style={{width: '120px', textAlign: 'center',marginLeft: '100px'}}>
-                            {convertPrice(order.price)}
-                        </div>
+                        <div style={{ textAlign: "center" }}>
+                                {convertPrice(order.price)}
+                            </div>
 
                         {/* số lượng */}
-                        <div style={{width: '120px', display: 'flex', justifyContent:'center' ,marginLeft: '100px'}}>
+                        <div  style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                             <WrapperCountOrder>
-                            <button onClick={() => handleChangeCount('decrease', order.product)} style={{border: 'none', background: 'none', cursor: 'pointer'}}>
+                            <Button onClick={() => handleChangeCount('decrease', order.product)}     
+                                                style={{
+                                                    border: "none",
+                                                    background: "none",
+                                                    cursor: "pointer",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center"
+                                                }}>
                                 <MinusOutlined style={{ color :'#000' ,fontSize :'10px'}}  />
-                            </button>
-                            <WrapperInputNumber value={order.amount} size="small" readOnly min={1} max={order.countInStock}/>
-                            <button onClick={() => handleChangeCount('increase', order?.product , order?.amount === order?.countInStock) } style={{border: 'none', background: 'transparent', cursor: 'pointer'}}>
+                            </Button>
+                            {/* <InputNumber style={{ width: "60px" }} className='soothutu' value={order.amount} size="small" readOnly min={1} max={order.countInStock}/> */}
+                            <WrapperInputNumber 
+                                value={order.amount} 
+                                size="small" 
+                                min={1} 
+                                max={order.countInStock} 
+                                style={{ width: "50px" }} 
+                                readOnly
+                                />
+                            <Button onClick={() => handleChangeCount('increase', order?.product , order?.amount === order?.countInStock) } 
+                                                style={{
+                                                    border: "none",
+                                                    background: "transparent",
+                                                    cursor: "pointer",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center"
+                                                }}>
                                 <PlusOutlined style={{ color: '#000', fontSize: '10px' }} min={1} max={order.countInStock}/>
-                            </button>
+                            </Button>
                             </WrapperCountOrder>
                         </div>
                         {/* thành tiền */}
-                        <div>
-                        <div style={{width:'120px', textAlign:'center', color:'rgb(255,66,78)', marginRight: '16px', fontWeight:500}}>
-                            {convertPrice(order.amount * order.price)}
-                        </div>
-                        </div>
+                                    <div style={{ textAlign: "center", color: "rgb(255,66,78)", fontWeight: 500 }}>
+                                        {convertPrice(order.amount * order.price)}
+                                    </div>
                         {/* delete */}
                         <div style={{width:'40px', display:'flex', justifyContent:'center'}}>
                             <DeleteOutlined onClick={() => handleDeleteItem(order.product)}  style={{cursor:'pointer'}}/>
@@ -298,27 +332,27 @@ console.log('đơn hàng' , order)
                         </WrapperInfo>
                     <div style={{width : '100%'}}>
                         <WrapperInfoSection>
-                            <RowInfo  style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <RowInfo  style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '20px'}}>
                                 <span>Tạm tính</span>
                                 <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(priceMemo)}</span>
                             </RowInfo>
-                                <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                                <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '20px'}}>
                                 <span>Giảm giá</span>
                                 <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(discountMemo)}</span>
                             </RowInfo>
-                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '20px'}}>
                                 <span>Thuế</span>
-                                <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>0</span>
+                                <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>0 VND</span>
                             </RowInfo>
-                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '15px'}}>
                                 <span>Phí Giao Hàng</span>
                                 <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(deliveryPriceMemo)}</span>
                             </RowInfo>
                         </WrapperInfoSection>
                         <WrapperTotalSection>
-                            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between', gap: '20px'}}>
                                 <span>Tổng cộng</span>
-                                <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(totalPriceMemo)}</span>
+                                <span style={{color: 'rgba(245, 35, 7, 1)' ,fontSize: '14px' , fontWeight: 'bold', display : 'flex' }}>{convertPrice(totalPriceMemo)}</span>
                             </div>
                         </WrapperTotalSection>
                     </div>
@@ -326,13 +360,14 @@ console.log('đơn hàng' , order)
                                         border = {false}
                                         size = {40} 
                                         styleButton ={{
-                                                backgroundColor : 'rgb(224, 1, 16)' ,
+                                                backgroundColor : 'rgba(245, 35, 7, 1)' ,
                                                 height : '48px' ,
-                                                width : '228PX' ,
+                                                width : '250px' ,
                                                 border : 'none' ,
-                                                borderRadius : '4px'
+                                                borderRadius : '4px',
+                                                marginTop : '20px'
                                          }}
-                                         textButton ={ 'Chọn mua'}
+                                         textButton ={ 'Đặt Hàng'}
                                          styleTextButton = {{ color : '#efefef' , fontSize : '15px', fontWeight : '700'}}
                                          onClick={handleAddCart}  >
                                 </ButtonComponent>
@@ -373,7 +408,7 @@ console.log('đơn hàng' , order)
               name="address"
               rules={[{ required: true, message: 'Please input your address!' }]}
             >
-              <InputComponent value={stateUserDetails.address} onChange={handleOnChangeDetails} name="Address" />
+              <InputComponent value={stateUserDetails.address} onChange={handleOnChangeDetails} name="address" />
             </Form.Item>
             <Form.Item
               label="City"
@@ -382,11 +417,6 @@ console.log('đơn hàng' , order)
             >
               <InputComponent value={stateUserDetails.city} onChange={handleOnChangeDetails} name="city" />
             </Form.Item>
-            {/* <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                Apply
-              </Button>
-            </Form.Item> */}
           </Form>          
           </ModalComponent>
         </div>

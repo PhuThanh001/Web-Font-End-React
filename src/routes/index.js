@@ -88,7 +88,6 @@ export const routes = [
       path : '/Product-details/:id',
       page : ProductDetailsPage,
       isShowHeader : true,
-      isPrivate: true
     },
     {
       path : '/Product/:type',

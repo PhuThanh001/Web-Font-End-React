@@ -2,14 +2,15 @@ import { Col ,InputNumber } from "antd"
 import styled from "styled-components"
 
 export const WrapperItemOrder = styled.div`
-  display: flex;            
+    display: grid;
+      grid-template-columns: 400px 120px 160px 160px 60px;
   align-items: center;
   padding: 15px 20px;
   background-color: #f9f9f9;
   border-bottom: 1px solid #e0e0e0;
   font-weight: 500;
   min-height: 60px;
-`
+`;
 
 export const WrapperStyleHeaderDelivery = styled.div`
   background: rgb(255 ,255 ,255);
@@ -29,6 +30,8 @@ export const WrapperStyleHeaderDelivery = styled.div`
 `
 
 export const WrapperStyleHeader = styled.div`
+  display: grid;
+  grid-template-columns: 400px 120px 160px 160px 60px;
   align-items: center;
   justify-content: space-between;
   padding: 15px 20px;
@@ -103,12 +106,10 @@ export const WrapperTotalSection = styled.div`
   }
 `;
 export const WrapperCountOrder = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 84px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-`
+    display: flex;                // cho các phần tử con nằm ngang
+    align-items: center;         // căn giữa theo chiều dọc
+    gap: 1px;
+`;
 export const WrapperRight = styled.div`
     width: 320px;
     margin-left: 20px;
@@ -137,7 +138,7 @@ export const WrapperPriceDiscount = styled.div`
     font-weight : 500; 
 `
 export const WrapperInputNumber = styled(InputNumber)`
-  display : content;
+  display : flex;
   width: 50px;
   height: 28px;
 `;

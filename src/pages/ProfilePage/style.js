@@ -19,7 +19,7 @@ export const WrapperContentProfile = styled.div`
 `   
 export const WrapperLable = styled.label`
     color: #000 ;
-    font-size:12px ;
+    font-size:20px ;
     line-height : 30px;
     font-weight: 600
 `

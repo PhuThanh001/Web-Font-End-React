@@ -15,7 +15,15 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+/* Fix message container nếu bị ẩn hoặc trùng layer */
+.ant-message {
+  z-index: 9999 !important;
+  position: fixed !important;
+  top: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  pointer-events: auto !important;
+}
 a {
   font-weight: 500;
   color: #646cff;
@@ -54,7 +62,11 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-
+.ant-steps-icon {
+  display: inline-flex !important;
+  font-size: 1800px !important;
+  color: rgba(189, 6, 6, 0.88) !important; /* màu mặc định */
+}
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -72,4 +84,12 @@ button:focus-visible {
   margin: 0;
   padding: 0;
 }
+}
+.ant-steps .ant-steps-icon {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px !important;
+  font-weight: 600;
+  color: #fff; /* màu số */
 }

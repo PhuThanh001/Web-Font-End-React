@@ -16,6 +16,7 @@ import * as OrderService  from '../../service/OrderService';
 import imageCompression from 'browser-image-compression';
 import { orderContant } from '../../contant';
 import { Excel } from 'antd-table-saveas-excel';
+import PieChartComponent from './piechart';
 
 
 
@@ -60,7 +61,6 @@ const OrderAdmin = () => {
   //   return res
   // })
   const mutationUpdate = useMutationHook(async (data) => {
-    console.log('data' , data)
     const {
       id ,
       token,
@@ -85,14 +85,12 @@ const OrderAdmin = () => {
 )
     const getAllOrder = async () => {
     const res = await OrderService.getAllOrder()
-    console.log('product ', res)
     return res
   }
   //nếu hàm không được gọi thì console.log() không được thực thi
   const fetchGetDetailsUser = async () =>{
     const res = await UserService.getUserDetails(rowSelected)
-  console.log('🟢 API Response:', res);
-  console.log('🔵 res.data:', res?.data);    
+ 
   if(res?.data){
       setStateUserDetails({
         name: res?.data.data.name,
@@ -103,7 +101,6 @@ const OrderAdmin = () => {
     }
     SetIsLoadingUpdate(false)
   } 
-  console.log('stateProduct' , stateUserDetails)
   useEffect(() => {
     form.setFieldsValue(stateUserDetails)
   }, [form , stateUserDetails] )
@@ -115,13 +112,11 @@ const OrderAdmin = () => {
       }
     }, [rowSelected])  
 
-  console.log('StateProduct' , stateUserDetails)
   const handleDetailsUser = () => {
       if(rowSelected) {
       // SetIsLoadingUpdate(true)
       fetchGetDetailsUser()
     }
-    console.log('rowSelected' , rowSelected)
     SetIsOpenDraw(true)
   }  
   const handleDeleteUser = () => {
@@ -136,7 +131,6 @@ const OrderAdmin = () => {
 
   const queryOrder = useQuery({ queryKey: ['order'], queryFn: getAllOrder });
   const {isLoading: isLoadingOrder , data: orders} = useQuery({queryKey: ['orders'] , queryFn: getAllOrder})
-  console.log('danh sach đơn hàng' , orders)
 
   const renderAction = () => {
     return (
@@ -231,13 +225,6 @@ const getColumnSearchProps = dataIndex => ({
             ...getColumnSearchProps('username')
         },
         {
-            title: 'Email',
-            dataIndex: 'email',
-            render: (test) => <a>{test}</a>, 
-            sorter: (a,b) => a.email.length - b.email.length,
-            ...getColumnSearchProps('email')
-        },
-        {
           title: 'Phone',
           dataIndex: 'phone',
           sorter: (a, b) => a.phone - b.phone,
@@ -262,12 +249,18 @@ const getColumnSearchProps = dataIndex => ({
           ...getColumnSearchProps('paymentMethod')
         },
         {
-          title: 'Address',
-          dataIndex: 'address',
-          sorter: (a, b) => a.address.length - b.address.length,
-          ...getColumnSearchProps('address')
+          title: 'isPaid',
+          dataIndex: 'isPaid',
+          sorter: (a, b) => a.isPaid.length - b.isPaid.length,
+          ...getColumnSearchProps('isPaid')
         },
         {
+          title: 'isDelivered',
+          dataIndex: 'isDelivered',
+          sorter: (a, b) => a.isDelivered.length - b.isDelivered.length,
+          ...getColumnSearchProps('isDelivered')
+        },
+      {
             title: 'action',
             dataIndex: 'action',
             render: renderAction
@@ -279,7 +272,6 @@ const getColumnSearchProps = dataIndex => ({
   //       ,isPaid: order?.isPaid ? 'TRUE' : 'FALSE'} 
   //       }) 
 const dataTable = orders?.data?.map((order) => {
-  console.log("👉 order.paymentMethod =", order?.paymentMethod);
 
   return {
     ...order,
@@ -288,12 +280,12 @@ const dataTable = orders?.data?.map((order) => {
     phone: order?.shippingAddress?.phone || '',
     address: order?.shippingAddress?.address || '',
     paymentMethod: orderContant?.payment[order?.paymentMethod] || 'N/A',
-    isPaid: order?.isPaid ? 'TRUE' : 'FALSE'
+    isPaid: order?.isPaid ? 'TRUE' : 'FALSE',
+    isDelivered: order?.isDelivered ? 'TRUE' : 'FALSE',
+    TotalPrice: order?.totalPrice || 0,
   };
 }) || [];
-        console.log('dataTable', dataTable)
     useEffect(() => {
-      console.log('isSuccess:', isSuccessUpdate, 'isError:', isErrorUpdate);
       if (isSuccessUpdate && dataUpdate?.status ==='ok') {
         messageApi.success('Cập nhật thành công!');
         handleCloseDrawer()
@@ -302,7 +294,6 @@ const dataTable = orders?.data?.map((order) => {
       }
     }, [isSuccessUpdate, isErrorUpdate, messageApi]);
     useEffect(() => {
-      console.log('isSuccess:', isSuccessDelete, 'isError:', isErrorDelete);
       if (isSuccessDelete && dataDelete?.status ==='ok') {
         messageApi.success('Xóa thành công!');
         handleCloseDrawer()
@@ -345,7 +336,6 @@ const dataTable = orders?.data?.map((order) => {
       })
   }
   const handleOnChangeDetails = (e) => {
-      console.log('check' , e.target.name ,e.target.value)
       setStateUserDetails({
         ...stateUserDetails,
         [e.target.name]: e.target.value
@@ -375,7 +365,6 @@ const handleOnchangeAvatar = async (uploadData) => {
     });
     const preview = await getBase64(compressedFile);
     setStateUser((prev) => ({ ...prev, image: preview }));
-    console.log('preview length:', preview.length);
   } catch (error) {
     console.error('Lỗi khi nén hoặc chuyển file sang base64:', error);
   }
@@ -398,7 +387,6 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
     });
     const preview = await getBase64(compressedFile);
     setStateUserDetails((prev) => ({ ...prev, image: preview }));
-    console.log('preview length:', preview.length);
   } catch (error) {
     console.error('Lỗi khi nén hoặc chuyển file sang base64:', error);
   }
@@ -406,6 +394,9 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
 return (
     <div>
       <WrapperHeader>Quản lý người dùng</WrapperHeader>
+      <div style={{ height: 200 , width: 200 }}>
+      <PieChartComponent order={orders?.data} />
+      </div>
       <div style={{ marginTop: '10px' }}>
         <Button
           style={{

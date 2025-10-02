@@ -14,7 +14,7 @@ export const WrapperItemOrder = styled.div`
 export const WrapperContainer = styled.div`
   width: 100%;
 `
-export const WrapperValue = styled.div`
+export const WrapperValuee = styled.div`
   background: rgb(240, 248, 255);
   padding: 10px;
   border-radius: 4px;
@@ -23,6 +23,16 @@ export const WrapperValue = styled.div`
   color: #000;
   margin-top: 4px;
 `
+export const WrapperValue = styled.div`
+  background: #e6f2ff; /* xanh nhạt hơn */
+  padding: 12px;
+  border-radius: 8px;
+  width: 100%;
+  margin-top: 6px;
+  color: #003366; /* xanh đậm */
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+`;
 
 export const WrapperStyleHeader = styled.div`
   align-items: center;
@@ -150,8 +160,29 @@ export const WrapperPriceDiscount = styled.div`
     font-weight : 500; 
 `
 export const WrapperInputNumber = styled(InputNumber)`
-  display : content;
-  width: 50px;
-  height: 28px;
+  display: inline-block; /* Sửa từ display: content thành inline-block */
+  width: 40px; /* Tăng width để hiển thị số */
+  height: 32px; /* Tăng height cho dễ nhìn */
+  text-align: center; 
+  border: none; 
+  border-radius: 4px; 
+  padding: 0 8px; 
+  font-size: 18px; 
+  font-weight: 100;
+
+  &:focus {
+    outline: none; /* Loại bỏ viền focus mặc định */
+    box-shadow: none; /* Loại bỏ shadow khi focus */
+  }
+
+/* Ẩn viền khi hover (nếu cần) */
+  &:hover {
+    border: none;
+  }
+
+  /* Ẩn nút tăng/giảm nếu không cần */
+  .ant-input-number-handler-wrap {
+    display: none;
+  }
 `;
 

@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { orderContant } from '../../contant';
 import { convertPrice } from '../../utils';
 import { WrapperAllPrice, WrapperItemLabel ,WrapperHeaderUser , WrapperInfoUser 
-    , WrapperContentInfo ,WrapperStyleContent, WrapperItem , WrapperNameProduct ,WrapperProducts  } from './style';
+    , WrapperContentInfo ,WrapperStyleContent, WrapperItem , WrapperNameProduct ,WrapperProducts,GridHeader,TotalsRow,ProductRow  } from './style';
 import Loading from '../../components/LoadingComponent/loading';
 
 
@@ -18,7 +18,6 @@ const DetailsOrderPage = () => {
     
     const fetchDetailsOrder = async () => {
         const res = await OrderService.getOrderDetails(id,state?.AccessToken)
-        console.log('data tra ve:', res.data)
         return res.data
     }
 
@@ -38,7 +37,6 @@ const DetailsOrderPage = () => {
         totalPrice = 0
         } = data || {}
 
-
     const priceMemo = useMemo(() => {
         const result = data?.orderItems?.reduce((total , cur) => {
             return total + ((cur.price * cur.amount))
@@ -52,7 +50,7 @@ const DetailsOrderPage = () => {
     <div style={{width :'100%' , height: '100vh' , background:'#f5f5fa'}}>
     <div style={{width :'100%'  , margin: '0 auto' }}>
         <h4> Chi tiết đơn hàng </h4>
-        <WrapperHeaderUser>
+        <WrapperHeaderUser className='wrapperHeader'>
             <WrapperInfoUser>
                 <WrapperLable>Địa chỉ người nhận</WrapperLable>
                 <WrapperContentInfo>
@@ -64,8 +62,8 @@ const DetailsOrderPage = () => {
             <WrapperInfoUser>
                 <WrapperLable>Hình Thức Giao Hàng </WrapperLable>
                 <WrapperContentInfo>
-                    <div className='delivery-info'> <span>FAST </span> giao hàng tiết kiệm </div>
-                    <div className='delivery-fee'> <span> phí giao hàng </span> {data?.shippingPrice} </div>
+                    <div className='delivery-info'> <span style={{color: 'yellow', fontfamily: 'sans-serif'}}> FAST </span> giao hàng tiết kiệm </div>
+                    <div className='delivery-fee'> <span> phí giao hàng : </span> {convertPrice(data?.shippingPrice)} </div>
                 </WrapperContentInfo>
             </WrapperInfoUser>
             <WrapperInfoUser>
@@ -76,79 +74,40 @@ const DetailsOrderPage = () => {
                 </WrapperContentInfo>
             </WrapperInfoUser>
             </WrapperHeaderUser>
-            <WrapperStyleContent>
-                <div style={{display: 'grid',
-  gridTemplateColumns: '610px 200px 200px 200px',
-  alignItems: 'center',
-  fontWeight: 'bold',
-  borderBottom: '1px solid #eee',
-  marginBottom: '10px'}}  >
-                    <div style={{width:'610px'}}  > Sản phẩm </div>
-                            <WrapperItemLabel> Giá </WrapperItemLabel>
-                            <WrapperItemLabel> Số Lượng</WrapperItemLabel>
-                            <WrapperItemLabel> giảm giá  </WrapperItemLabel>
-                            {/* <WrapperItemLabel> Tạm tính</WrapperItemLabel>
-                            <WrapperItemLabel> Phí vận chuyển </WrapperItemLabel>
-                            <WrapperItemLabel> Tổng cộng </WrapperItemLabel> */}
-                    </div>
-                    {orderItems.map((order) => {
-                        return ( <WrapperProducts>
-                        <WrapperNameProduct>
-                            <img src={order?.image} 
-                                style={{
-                                    width: '70px',
-                                    height: '70px',
-                                    objectFit:'cover',
-                                    border:'1px solid rgb(238 ,238,238)',
-                                }}
-                            />
-                            <div style={{
-                                    width: 260,
-                                    overflow: 'hidden',
-                                    textOverflow:'ellipsis',
-                                    height: '70px',
-                                    marginLeft:'7px',
-                                    whiteSpace:'nowrap'
+<WrapperStyleContent>
+  <GridHeader>
+    <div> Sản phẩm </div>
+    <div style={{textAlign:'center'}}> Giá </div>
+    <div style={{textAlign:'center'}}> Số Lượng</div>
+    <div style={{textAlign:'center'}}> Giảm giá  </div>
+  </GridHeader>
 
-                                }}>
-                            Điện Thoại
-                            </div>
-                        </WrapperNameProduct>
-                        <WrapperItem>{convertPrice(order?.price)} </WrapperItem>
-                        <WrapperItem>{order?.amount} </WrapperItem>
-                        <WrapperItem>{order?.discount ? convertPrice(order?.discount) : '0 VND'} </WrapperItem>
-                        {/* <WrapperItem>100.000 </WrapperItem>
-                        <WrapperItem>{convertPrice(data?.shippingPrice)} </WrapperItem>
-                        <WrapperItem>{convertPrice(data?.TotalPrice)} </WrapperItem> */}
-                    </WrapperProducts>
-                        )
-                    })}
-                    <div
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "610px 200px 200px 200px", // giống header
-                        marginTop: "10px",
-                        borderTop: "1px solid #eee",
-                        paddingTop: "10px",
-                    }}
-                    >
-                    {/* để trống 3 cột đầu */}
-                    <div style={{ gridColumn: "4 / 5" }}>
-                        <WrapperAllPrice>
-                        <WrapperItemLabel>Tạm tính</WrapperItemLabel>
-                        <WrapperItem>{convertPrice(priceMemo)}</WrapperItem>
-                        </WrapperAllPrice>
-                        <WrapperAllPrice>
-                        <WrapperItemLabel>Phí vận chuyển</WrapperItemLabel>
-                        <WrapperItem>{convertPrice(data?.shippingPrice)}</WrapperItem>
-                        </WrapperAllPrice>
-                        <WrapperAllPrice>
-                        <WrapperItemLabel>Tổng cộng</WrapperItemLabel>
-                        <WrapperItem>{convertPrice(data?.totalPrice)}</WrapperItem>
-                        </WrapperAllPrice>
-                    </div>
-                    </div>
-            </WrapperStyleContent>
+  {orderItems.map((order) => (
+    <ProductRow key={order.product}>
+      <WrapperNameProduct>
+        <img src={order?.image} style={{ width:70, height:70, objectFit:'cover', border:'1px solid #eee' }}/>
+        <div style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+          {order?.name}
+        </div>
+      </WrapperNameProduct>
+
+      <WrapperItem>{convertPrice(order?.price)}</WrapperItem>
+      <WrapperItem>{order?.amount}</WrapperItem>
+      <WrapperItem>{order?.discount ? `${order?.discount}%` : '0%'}</WrapperItem>
+    </ProductRow>
+  ))}
+
+  <TotalsRow>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8 }}>
+      <div style={{marginRight: '100px'}}><strong>Tạm tính:</strong> {convertPrice(priceMemo)}</div>
+      <div><strong>Phí vận chuyển:</strong> {convertPrice(data?.shippingPrice)}</div>
+      <div style={{ fontSize:18, color:'red' }}><strong>Tổng cộng:</strong> {convertPrice(data?.totalPrice)}</div>
+    </div>
+  </TotalsRow>
+</WrapperStyleContent>
     </div>
     </div>
     </Loading>

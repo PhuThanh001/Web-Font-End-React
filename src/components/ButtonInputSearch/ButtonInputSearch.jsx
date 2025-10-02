@@ -7,32 +7,29 @@ import InputComponent from "../InputComponent/InputComponent";
 const ButtonInputSearch = (props) => {
   const {
     size,
-    PlaceHolder,
-    textButton,
-    bordered,
-    backgroundColorInput = '#fff',
-    backgroundColorButton = 'rgba(31, 69, 112, 1)',
-    colorButton = '#fff',
+    placeholder, // ✅ viết đúng camelCase
+    bordered = true,
+    backgroundColorInput = '#e6e4ecff',
+    backgroundColorButton = 'rgba(136, 8, 8, 1)',
+    colorButton = '#d7d7dfff', // ✅ default trắng để dễ đọc
+    ...rest // ✅ gom lại props còn lại
   } = props;
-
   return (
     <div style={{ display: 'flex' }}>
       <InputComponent
         size={size}
-        placeholder={PlaceHolder}
-        borderless={bordered} // đã đúng
+        placeholder={placeholder}
+        borderless={!bordered} // ✅ đúng logic
         style={{ backgroundColor: backgroundColorInput }}
-        {...props}
+        {...rest}
       />
-      <ButtonComponent
-        size={size}
-        icon={<SearchOutlined color="colorButton" style={{ color: '#fff' }} />}
-        styleButton={{ background: backgroundColorButton, bordered: !bordered && 'none' }}
-        textButton={textButton}
-        styleTextButton={{ color: colorButton }}
-      >
-        <span style={{ color: colorButton }}>{textButton}</span>
-      </ButtonComponent>
+    <ButtonComponent
+      size="large"
+      icon={<SearchOutlined style={{ color: colorButton }} />}
+      textButton="Tìm kiếm" 
+      styleButton={{ backgroundColor: "blue", color: "white", border: "1px solid blue" }}  
+      styleTextButton={{ fontWeight: 500 }}
+    />
     </div>
   );
 };

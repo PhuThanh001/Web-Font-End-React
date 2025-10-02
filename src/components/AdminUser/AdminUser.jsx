@@ -1,4 +1,4 @@
-import React, { useState, useRef ,useEffect  } from 'react';
+import React, { useState, useRef ,useEffect } from 'react';
 import { WrapperHeader,WrapperUpLoadFile } from './style';
 import { PlusCircleFilled ,SearchOutlined,DeleteOutlined,EditOutlined } from '@ant-design/icons';
 import {useQuery} from '@tanstack/react-query'
@@ -15,6 +15,7 @@ import { useMutationHook } from '../../hooks/useMutationHook';
 import * as UserService  from '../../service/UserService';
 import imageCompression from 'browser-image-compression';
 import { Excel } from 'antd-table-saveas-excel';
+import { useQueryClient , useMutation } from '@tanstack/react-query'
 
 
 
@@ -30,7 +31,8 @@ const AdminUser = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  
+  const queryClient = useQueryClient()
+
   const [stateUser , setStateUser] = useState({
     name: '',
     email:'',
@@ -59,7 +61,6 @@ const AdminUser = () => {
   //   return res
   // })
   const mutationUpdate = useMutationHook(async (data) => {
-    console.log('data' , data)
     const {
       id ,
       token,
@@ -71,7 +72,7 @@ const AdminUser = () => {
     return res
   },
 )
-  const mutationDelete = useMutationHook(async (data) => {
+  const mutationDeletes = useMutationHook(async (data) => {
     const {
       id ,
       token
@@ -82,16 +83,26 @@ const AdminUser = () => {
     return res
   },
 )
+const mutationDelete = useMutation({
+  mutationFn: async ({ id, token }) => {
+    return await UserService.DeleteUser(id, token)
+  },
+  onSuccess: () => {
+    console.log("Xoá thành công")
+    SetIsModalOpenDelete(false)
+    queryClient.invalidateQueries(['users'])
+  },
+  onError: (error) => {
+    console.error("Xoá thất bại:", error)
+  }
+})
     const getAllUser = async () => {
     const res = await UserService.getAllUser(user?.access_token)
-    console.log('product ', res)
     return res
   }
   //nếu hàm không được gọi thì console.log() không được thực thi
   const fetchGetDetailsUser = async () =>{
-    const res = await UserService.getUserDetails(rowSelected)
-  console.log('🟢 API Response:', res);
-  console.log('🔵 res.data:', res?.data);    
+    const res = await UserService.getUserDetails(rowSelected) 
   if(res?.data){
       setStateUserDetails({
         name: res?.data.data.name,
@@ -102,7 +113,7 @@ const AdminUser = () => {
     }
     SetIsLoadingUpdate(false)
   } 
-  console.log('stateProduct' , stateUserDetails)
+
   useEffect(() => {
     form.setFieldsValue(stateUserDetails)
   }, [form , stateUserDetails] )
@@ -114,28 +125,43 @@ const AdminUser = () => {
       }
     }, [rowSelected])  
 
-  console.log('StateProduct' , stateUserDetails)
-  const handleDetailsUser = () => {
+
+    const handleDetailsUser = () => {
       if(rowSelected) {
       // SetIsLoadingUpdate(true)
       fetchGetDetailsUser()
     }
-    console.log('rowSelected' , rowSelected)
     SetIsOpenDraw(true)
   }  
-  const handleDeleteUser = () => {
-    mutationDelete.mutate({id:  rowSelected , token: user?.access_token}),{
+  // const handleDeleteUser = () => {
+  //   mutationDelete.mutate({id:  rowSelected , token: user?.access_token}),{
+  //     onSettled: () => {
+  //       console.log("xoa duoc roi" )
+  //       queryUser.refetch()
+  //     }
+  //   }
+  // }
+  const handleDeleteUserr = () => {
+  mutationDelete.mutate(
+    { id: rowSelected, token: user?.access_token },
+    {
       onSettled: () => {
+        console.log("xoa duoc roi")
+        SetIsModalOpenDelete(false)
         queryUser.refetch()
       }
     }
-  }
+  )
+}
+const handleDeleteUser = () => {
+  mutationDelete.mutate({ id: rowSelected, token: user?.access_token })
+}
+
   const { data:dataUpdate, isPending:isPendingUpdate , isError:isErrorUpdate , isSuccess:isSuccessUpdate } = mutationUpdate
   const { data:dataDelete, isPending:isPendingDelete , isError:isErrorDelete , isSuccess:isSuccessDelete } = mutationDelete
 
   const queryUser = useQuery({ queryKey: ['user'], queryFn: getAllUser });
   const {isLoading: isLoadingUser , data: users} = useQuery({queryKey: ['users'] , queryFn: getAllUser})
-  console.log('danh sach người dùng' , users)
 
   const renderAction = () => {
     return (
@@ -265,9 +291,7 @@ const getColumnSearchProps = dataIndex => ({
   const dataTable = users?.data?.length && users?.data?.map((user) => {
      return{...user, key: user._id, isAdmin: user.isAdmin ? 'TRUE' : 'FALSE'} 
         }) 
-        console.log('dataTable', dataTable)
     useEffect(() => {
-      console.log('isSuccess:', isSuccessUpdate, 'isError:', isErrorUpdate);
       if (isSuccessUpdate && dataUpdate?.status ==='ok') {
         messageApi.success('Cập nhật thành công!');
         handleCloseDrawer()
@@ -276,7 +300,6 @@ const getColumnSearchProps = dataIndex => ({
       }
     }, [isSuccessUpdate, isErrorUpdate, messageApi]);
     useEffect(() => {
-      console.log('isSuccess:', isSuccessDelete, 'isError:', isErrorDelete);
       if (isSuccessDelete && dataDelete?.status ==='ok') {
         messageApi.success('Xóa thành công!');
         handleCloseDrawer()
@@ -403,79 +426,6 @@ return (
       }
     }} />
     </div>
-      {/* <Modal
-        title="Tạo Sản Phẩm"
-        open={isModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <Loading isPending={isPendingUpdate}>
-          <Form
-            name="name"
-            labelCol={{ span: 4 }}
-            wrapperCol={{ span: 20 }}
-            style={{ maxWidth: 600 }}
-            onFinish={onFinish}
-            autoComplete="on"
-          >
-            <Form.Item
-              label="Name"
-              name="name"
-              rules={[{ required: true, message: 'Please input your username!' }]}
-            >
-              <InputComponent value={stateUser.name} onChange={handleOnChange} name="name" />
-            </Form.Item>
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[{ required: true, message: 'Please input your Type!' }]}
-            >
-              <InputComponent value={stateUser.type} onChange={handleOnChange} name="email" />
-            </Form.Item>
-            <Form.Item
-              label="Phone"
-              name="phone"
-              rules={[{ required: true, message: 'Please input your Count In Stock!' }]}
-            >
-              <InputComponent value={stateUser.countInStock} onChange={handleOnChange} name="phone" />
-            </Form.Item>
-            <Form.Item
-              label="Description"
-              name="description"
-              rules={[{ required: true, message: 'Please input your Description!' }]}
-            >
-              <InputComponent value={stateUser.description} onChange={handleOnChange} name="description" />
-            </Form.Item>
-            <Form.Item
-              label="Image"
-              name="image"
-              rules={[{ required: true, message: 'Please input your Image!' }]}
-            >
-              <WrapperUpLoadFile onChange={handleOnchangeAvatar} maxCount={1} beforeUpload={() => false}>
-                <Button>Select File</Button>
-                {stateUser?.image && (
-                  <img
-                    src={stateUser?.image}
-                    style={{
-                      height: '60px',
-                      width: '60px',
-                      borderRadius: '50%',
-                      objectFit: 'cover',
-                      marginLeft: '10px'
-                    }}
-                    alt="avatar"
-                  />
-                )}
-              </WrapperUpLoadFile>
-            </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
-        </Loading>
-      </Modal> */}
       <DrawComponent title="chi tiết sản phẩm" isopen={isOpenDraw} onClose={() => SetIsOpenDraw(false)} width="90%">
         <Loading isPending={isLoadingUpdate}>
           <Form

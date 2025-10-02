@@ -15,10 +15,9 @@ const MyOrder = () => {
     const location = useLocation() 
     const {state} = location
     const navigate = useNavigate()
-    console.log('id va accessTokeb' , state?.id , state?.token)
     const fetchMyOrder = async () => {
         const res = await OrderService.getOrderbyUserId(state?.id , state?.token)
-        console.log('data tra ve:', res.data)
+        console.log("res" , res.data)
         return res.data
     }
     const queryOrder = useQuery({
@@ -37,7 +36,6 @@ const MyOrder = () => {
         return res
       },
     )
-    console.log('queryOrder', queryOrder)
     const {isLoading , data } = queryOrder
     const handleDetailsOrder = (id) => {
         navigate(`/details-order/${id}`)
@@ -50,7 +48,6 @@ const MyOrder = () => {
             }
         )
     }
-    console.log('du lieu render' , data)
     const renderProduct = (data) => {
         return data?.map((order) => {
             return ( 
@@ -120,7 +117,7 @@ const MyOrder = () => {
             onClick={() => handleCancelOrder(order)}
             size={40} 
             StypeButton={{ height:'36px' }}
-            TextButton={'Hủy đơn hàng'}
+            textButton={'Hủy đơn hàng'}
             StypeTextButton={{
                 color: 'rgb(11 , 116 ,229)',
                 fontSize:'14px'
@@ -130,7 +127,7 @@ const MyOrder = () => {
             onClick={() => handleDetailsOrder(order?._id)}
             size={40} 
             StypeButton={{ height:'36px' }}
-            TextButton={'Xem chi tiết'}
+            textButton={'Xem chi tiết'}
             StypeTextButton={{
                 color: 'rgb(11 , 116 ,229)',
                 fontSize:'14px'

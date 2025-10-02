@@ -10,6 +10,7 @@ import * as UserService from '../../service/UserService';
 import { resetUser, updateUser } from '../../redux/slides/userSilde';
 import { searchProduct } from '../../redux/slides/productSlide';
 import Loading from '../LoadingComponent/loading';
+import ButtonComponent from '../ButtonComponent/ButtonComponent';
 
 const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
   const user = useSelector((state) => state.user, shallowEqual);
   const [search, setSearch] = useState('');
   const order = useSelector((state) => state.order);
+  console.log("user" , user)
 
   const handleLogout = async () => {
     setIsLoading(true);
@@ -45,16 +47,13 @@ useEffect(() => {
         console.log("Error fetchProfile: ", error);
       }
     }
-  };
-console.log('Thông tin User' , user._id , user.access_token)
-  
+  };  
 fetchProfile();
 }, [user?.access_token]);
 useEffect(() => {
   setIsLoading(true);
   setUserName(user?.name);
   setUserAvatar(user?.avatar);
-  console.log('useEffect triggered with user:', user);
   setIsLoading(false);
 }, [user?.name, user?.avatar, user?.access_token]);
 
@@ -84,7 +83,7 @@ const content = (
       navigate('/System/Admin')
     }else if(Type === 'my-order'){
       navigate('/my-order' , { state : {
-        id : user?._id,
+        id : user?.id,
         token: user?.access_token
       }}) 
     }else {
@@ -100,7 +99,6 @@ const content = (
   const onSearch = (e) => {
     setSearch(e.target.value);
     dispatch(searchProduct(e.target.value));
-    console.log('e', e.target.value);
   };
 
   return (
@@ -119,9 +117,13 @@ const content = (
             {!isHiddenSearch && (
               <Col span={13}>
                 <ButtonInputSearch
+                  className="input-search-header"
                   placeholder="input search text"
                   bordered={false}
-                  textButton="Tìm kiếm"
+                  TextButton="Tìm Kiếm"
+                  style={{ width: '100%' }}
+                  value={search}
+                  height="large"
                   size="large"
                   onChange={onSearch}
                 />

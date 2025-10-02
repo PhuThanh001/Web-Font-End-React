@@ -1,3 +1,6 @@
+import ColumnGroup from "antd/es/table/ColumnGroup";
+import { orderContant } from "./contant";
+
 export const isjsonstring = (data) => {
     try {
         JSON.parse(data);
@@ -23,7 +26,6 @@ export const getBase64 = (file) =>
               }
             } )
           }
-          console.log('arr:', arr, 'isArray:', Array.isArray(arr))
           results.push({
             label: 'Thêm type' ,
             value: 'add_type'
@@ -42,6 +44,37 @@ export const convertPrice = (price) => {
     return null;
   }
 };
+export const convertDataChart = (data , type) => {
+  try {
+    const object = {};
+
+
+    if (Array.isArray(data?.order)) {
+      data.order.forEach((opt, index) => {
+
+
+        const key = opt[type];
+        object[key] = (object[key] || 0) + 1;
+      })
+    } else {
+      console.warn('⚠️ data is not an array!')
+    }
+
+
+    const results = Object.keys(object).map((item) => {
+      return {
+        name: (orderContant?.payment?.[item]) || item,
+        value: object[item]
+      }
+    })
+
+    return results;
+  } catch (e) {
+    console.error('Error in convertDataChart:', e)
+    return [];
+  }
+}
+
 export const initFacebookSdk = () => {
     // Nếu đã có FB rồi thì resolve luôn
     if (window.FB) {

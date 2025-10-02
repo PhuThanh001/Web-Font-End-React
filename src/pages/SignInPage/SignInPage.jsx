@@ -49,13 +49,14 @@ const SignInPage = () => {
       }
     }
   }, [isSuccess]);
-const handleGetDetailsUser = async (id, token) => {
+
+  const handleGetDetailsUser = async (id, token) => {
   const res = await UserService.getUserDetails(id, token);
-  console.log('Response from getUserDetails:', res);
+  console.log("res" , res)
   const payload = { ...(res?.data?.data || res?.data), access_token: token };
-  console.log('Payload for updateUser:', payload);
+  console.log("payload" , payload)
   dispatch(updateUser(payload));
-}
+  }
   const handleOnChangeEmail = (value) => {
     setEmail(value);
   }

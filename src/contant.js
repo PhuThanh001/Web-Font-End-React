@@ -6,5 +6,8 @@ export const orderContant = {
     },
     payment : {
         later_money:'Thanh toán tiền mặt khi nhận hàng',
+        pay_pal: 'Thanh toán qua PayPal',
+        momo: 'Thanh toán qua MoMo',
+        vnpay: 'Thanh toán bằng VN-Pay',
     }
 };

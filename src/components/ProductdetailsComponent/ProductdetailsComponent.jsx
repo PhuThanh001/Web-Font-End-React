@@ -48,7 +48,6 @@ const ProductdetailsComponent = ({idProduct}) => {
         const fetchGetDetailsProduct = async (context) =>{
             const id = context?.queryKey && context?.queryKey[1]
             const res = await ProductService.GetDetailsProduct(id)
-            console.log('first', res)
             return res?.data
         }                 
         const { isLoading, data: productDetails, isPreviousdata } = useQuery({
@@ -56,7 +55,7 @@ const ProductdetailsComponent = ({idProduct}) => {
                 queryFn: fetchGetDetailsProduct,
                 enabled: !!idProduct
         });
-        console.log('productDetails' , productDetails)
+        console.log('ProductDetail' , productDetails)
         // useEffect(() => {
         //         const orderRedux = order?.orderItems?.find(item => item.product === productDetails?._id)
         //         if((orderRedux?.amount +  numProduct) <= orderRedux?.countInStock || (!orderRedux && productDetails.countInStock > 0)){
@@ -70,7 +69,6 @@ const ProductdetailsComponent = ({idProduct}) => {
         } ,[])
         useEffect(() => {
                 if (!productDetails) return; // chặn khi chưa có dữ liệu
-
                 const orderRedux = order?.orderItems?.find(item => item.product === productDetails?._id)
 
                 if ((orderRedux?.amount + numProduct) <= orderRedux?.countInStock ||
@@ -94,9 +92,7 @@ const ProductdetailsComponent = ({idProduct}) => {
                 if(!user?.id){
                         navigate('/SignIn' ,  {state : location?.pathname}) 
                 }else{
-                        console.log('add order product' , productDetails)
                         const orderRedux = order?.orderItems?.find(item => item.product === productDetails?._id)
-                        console.log('first' , orderRedux , numProduct)
                         if((orderRedux?.amount +  numProduct) <= orderRedux?.countInStock || !orderRedux && productDetails.countInStock > 0){
                         dispatch(addOrderProduct({
                                 orderItem: {
@@ -114,21 +110,20 @@ const ProductdetailsComponent = ({idProduct}) => {
                 }
         }
 }
-        console.log('productDetails' , productDetails , user)
         return (
                 <Loading isPending={isLoading}>
                 <Row className='rowww' style={{backgroundColor : '#fff' , padding : '16px' ,borderRadius : '4px'}} >
         <Col span={10} style={{ borderRight : '1px solid #e5e5e5' ,paddingLeft : '8px' }}>
-                <Image  src={productDetails?.Image} alt="Image Product"  preview = {false}/>
+                <Image  src={productDetails?.image} alt="Image Product"  preview = {false}/>
                 <Row>
                                   <WrapperStyleColImage span={4}>
-                                  <WrapperStyleImageSmall src={SmallImage} alt="image small" preview={false} /></WrapperStyleColImage>
+                                  <WrapperStyleImageSmall src={productDetails?.image} alt="image small" preview={false} /></WrapperStyleColImage>
                                   <WrapperStyleColImage span={4}>
-                                  <WrapperStyleImageSmall src={SmallImage} alt="image small" preview={false} /></WrapperStyleColImage>
+                                  <WrapperStyleImageSmall src={productDetails?.image} alt="image small" preview={false} /></WrapperStyleColImage>
                                   <WrapperStyleColImage span={4}>
-                                  <WrapperStyleImageSmall src={SmallImage} alt="image small" preview={false} /></WrapperStyleColImage>
+                                  <WrapperStyleImageSmall src={productDetails?.image} alt="image small" preview={false} /></WrapperStyleColImage>
                                   <WrapperStyleColImage span={4} >
-                                  <WrapperStyleImageSmall src={SmallImage} alt="image Small" preview={false} /></WrapperStyleColImage>
+                                  <WrapperStyleImageSmall src={productDetails?.image} alt="image Small" preview={false} /></WrapperStyleColImage>
                 </Row>
         </Col>
         <Col span={14} style={{paddingLeft : '10px'}} >
@@ -174,7 +169,7 @@ const ProductdetailsComponent = ({idProduct}) => {
                                                 border : 'none' ,
                                                 borderRadius : '4px'
                                          }}
-                                         TextButton ={ 'Chọn mua'}
+                                         textButton ={ 'Chọn mua'}
                                          styleTextButton = {{ color : '#efefef' , fontSize : '15px', fontWeight : '700'}}
                                          onClick={handleAddOrderProduct}  >
                                 </ButtonComponent>
@@ -186,9 +181,9 @@ const ProductdetailsComponent = ({idProduct}) => {
                                                 width : '228PX' ,
                                                 border : 'none' ,
                                                 borderRadius : '4px',
-                                                marginleft : '12px'
+                                                marginLeft : '12px'
                                          }}
-                                         TextButton ={ 'Mua trả sau lãi suất 5%'}
+                                         textButton ={ 'Mua trả sau lãi suất 5%'}
                                          styleTextButton = {{ color : '#efefef'  ,fontSize : '15px', fontWeight : '700'}}>
                                 </ButtonComponent>
                                 </div>

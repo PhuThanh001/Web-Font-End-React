@@ -22,7 +22,7 @@ const AdminProduct = () => {
   const { message: messageApi } = App.useApp(); // Lấy message từ context
   const [isModalOpen , setIsModelOpen] = useState(false)
   const [rowSelected , SetRowSelected] = useState('')
-  const [isOpenDraw, SetIsOpenDraw] = useState(false)
+  const [isOpenDraw, SetIsOpenDraw] = useState(false)  
   const [isLoadingUpdate , SetIsLoadingUpdate] = useState(false)
   const [isModalOpenDelete , SetIsModalOpenDelete] = useState(false)
   const user = useSelector((state) => state?.user)
@@ -69,20 +69,7 @@ const AdminProduct = () => {
     })
     return res
   })
-  const mutationUpdate = useMutationHook(async (data) => {
-    console.log('data' , data)
-    const {
-      id ,
-      token,
-      ...rests
-    } = data
-    const res = await ProductService.UpdateProduct(
-      id,
-      token,
-      {...rests})
-    return res
-  },
-)
+
   const mutationDelete = useMutationHook(async (data) => {
     const {
       id ,
@@ -108,7 +95,6 @@ const AdminProduct = () => {
 )
     const getAllProducts = async () => {
     const res = await ProductService.GetAllProduct( '' , 100 )
-    console.log('product ', res)
     return res
   }
   const fetchGetDetailsProduct = async () =>{
@@ -127,7 +113,6 @@ const AdminProduct = () => {
     }
     SetIsLoadingUpdate(false)
   } 
-  console.log('stateProduct' , stateProductDetails)
   useEffect(() => {
     if(!isModalOpen){
       form.setFieldsValue(initial())
@@ -159,13 +144,11 @@ const AdminProduct = () => {
         }
       }, [stateProductDetails, form])
       
-  console.log('StateProduct' , stateProductDetails)
   const handleDetailsProduct = () => {
       if(rowSelected) {
       // SetIsLoadingUpdate(true)
       fetchGetDetailsProduct()
     }
-    console.log('rowSelected' , rowSelected)
     SetIsOpenDraw(true)
   }  
   const handleChangeSelect = (value) => {
@@ -174,37 +157,42 @@ const AdminProduct = () => {
         type:value
       })
   }  
-  console.log('value={stateProduct.type}', stateProduct.type )
 
+  // const handleDeleteProduct = () => {
+  //   mutationDelete.mutate({id:  rowSelected , token: user?.access_token}),{
+  //     onSettled: () => {
+  //       queryProduct.refetch()
+  //     }
+  //   }
+  // }
   const handleDeleteProduct = () => {
-    mutationDelete.mutate({id:  rowSelected , token: user?.access_token}),{
+  mutationDelete.mutate(
+    { id: rowSelected, token: user?.access_token },
+    {
       onSettled: () => {
         queryProduct.refetch()
       }
     }
-  }
+  )
+}
+
+
   const handleDeleteManyProduct = (ids) => {
-    console.log('token' , user)
     mutationDeleteMany.mutate({id:  ids , token: user?.access_token}),{
       onSettled: () => {
         queryProduct.refetch()
       }
     }
   }
+
 const FetchAllTypeProduct = async () => {
   const res = await ProductService.get_all_type_product();
-  console.log("📌 API trả về:", res);
   return res;
 }
-  const { data, isPending , isError , isSuccess } = mutation
-  const { data:dataUpdate, isPending:isPendingUpdate , isError:isErrorUpdate , isSuccess:isSuccessUpdate } = mutationUpdate
-  const { data:dataDelete, isPending:isPendingDelete , isError:isErrorDelete , isSuccess:isSuccessDelete } = mutationDelete
-  const { data:dataDeleteMany, isPending:isPendingDeleteMany , isError:isErrorDeleteMany , isSuccess:isSuccessDeleteMany } = mutationDeleteMany
+
 
   const TypeProduct = useQuery({ queryKey: ['type-products'], queryFn: FetchAllTypeProduct });
-  console.log('typeProduct' , TypeProduct)
   const queryProduct = useQuery({ queryKey: ['products'], queryFn: getAllProducts });
-  console.log('sản phẩm nè' , queryProduct)
   const {isLoading: isLoadingProduct , data: products} = useQuery({queryKey: ['products'] , queryFn: getAllProducts})
 
   const renderAction = () => {
@@ -314,7 +302,6 @@ const getColumnSearchProps = dataIndex => ({
             },
           ],
           onFilter: (value, record) => {
-            console.log('value' , {value, record})
             if(value === '>='){
             return record.price >= 50
           } 
@@ -336,7 +323,6 @@ const getColumnSearchProps = dataIndex => ({
             },
           ],
           onFilter: (value, record) => {
-            console.log('value' , {value, record})
             if(value === '>='){
             return Number(record.rating) >= 3
           } 
@@ -356,34 +342,7 @@ const getColumnSearchProps = dataIndex => ({
   const dataTable = products?.data?.data?.length && products?.data?.data?.map((product) => {
      return{...product, key: product._id} 
         }) 
-        console.log('dataTable', dataTable)
-    useEffect(() => {
-      console.log('isSuccess:', isSuccess, 'isError:', isError);
-      if (isSuccess && data?.status ==='ok') {
-        messageApi.success('Cập nhật thành công!');
-        handleCloseDrawer()
-      } else if (isError) {
-        messageApi.error('Cập nhật thất bại!');
-      }
-    }, [isSuccess, isError, messageApi]);
-    useEffect(() => {
-      console.log('isSuccess:', isSuccessDelete, 'isError:', isErrorDelete);
-      if (isSuccessDelete && data?.status ==='ok') {
-        messageApi.success('Xóa thành công!');
-        handleCloseDrawer()
-      } else if (isError) {
-        messageApi.error('Cập nhật thất bại!');
-      }
-    }, [isSuccess, isError, messageApi]);
-    useEffect(() => {
-      console.log('isSuccess:', isSuccessDeleteMany, 'isError:', isErrorDeleteMany);
-      if (isSuccessDeleteMany && data?.status ==='ok') {
-        messageApi.success('xóa thành công!');
-        handleCloseDrawer()
-      } else if (isErrorDeleteMany) {
-        messageApi.error('xóa thất bại!');
-      }
-    }, [isSuccess, isError, messageApi]);
+
     const handleCloseDrawer = () => {
     SetIsOpenDraw(false);
     setStateProduct({
@@ -425,11 +384,23 @@ const getColumnSearchProps = dataIndex => ({
       countInStock: stateProduct.countInStock,
       discount: stateProduct.discount
     }
-    mutation.mutate(params,
-      {onSettled: () => {
-            queryProduct.refetch()
-      }
-  })
+  //   mutation.mutate(params,
+  //     {onSettled: () => {
+  //           queryProduct.refetch()
+  //     }
+  // })
+//   mutation.mutate(params, {
+//   onSettled: (data, error, variables, context) => {
+//     console.log("onSettled fired!", { data, error, variables, context })
+//     queryProduct.refetch()
+//   }
+// })
+mutation.mutate(params, {
+  onSettled: async () => {
+    const res = await queryProduct.refetch()
+    console.log("refetch result:", res)
+  }
+})
   }
   const handleOnChange = (e) => {
       setStateProduct({
@@ -438,22 +409,74 @@ const getColumnSearchProps = dataIndex => ({
       })
   }
   const handleOnChangeDetails = (e) => {
-      console.log('check' , e.target.name ,e.target.value)
       setStateProductDetails({
         ...stateProductDetails,
         [e.target.name]: e.target.value
       })
   } 
-  console.log('user' , user)
-  console.log('rowsellll' , rowSelected)
-  console.log('stateproduccc' , stateProductDetails)
+
   const OnUpdateProduct = (stateProductDetails) => {
       mutationUpdate.mutate({id: rowSelected , token : user?.access_token , ...stateProductDetails} , 
         {onSettled: () => {
+            handleCloseDrawer()   // đóng form
             queryProduct.refetch()
       }
   })
   }
+    const mutationUpdate = useMutationHook(async (data) => {
+    const {
+      id ,
+      token,
+      ...rests
+    } = data
+    const res = await ProductService.UpdateProduct(
+      id,
+      token,
+      {...rests})
+    return res
+  },
+)
+  const { data, isPending , isError , isSuccess } = mutation
+  const { data:dataUpdate, isPending:isPendingUpdate , isError:isErrorUpdate , isSuccess:isSuccessUpdate } = mutationUpdate
+  const { data:dataDelete, isPending:isPendingDelete , isError:isErrorDelete , isSuccess:isSuccessDelete } = mutationDelete
+  const { data:dataDeleteMany, isPending:isPendingDeleteMany , isError:isErrorDeleteMany , isSuccess:isSuccessDeleteMany } = mutationDeleteMany
+useEffect(() => {
+  if (isSuccessUpdate && dataUpdate?.status === 'OK') {
+    messageApi.success('Cập nhật thành công!');
+    handleCloseDrawer()
+  } else if (isErrorUpdate) {
+    messageApi.error('Cập nhật thất bại!');
+  }
+}, [isSuccessUpdate, isErrorUpdate, dataUpdate, messageApi])
+
+useEffect(() => {
+  if (isSuccess && data?.status === 'OK') {
+    setIsModelOpen(false);
+    messageApi.success('Tạo thành công!');
+    handleCloseDrawer()
+  } else if (isError) {
+    messageApi.error('Tạo thất bại!');
+  }
+}, [isSuccess, isError, data, messageApi])
+    useEffect(() => {
+      console.log('isSuccess:', isSuccessDelete, 'isError:', isErrorDelete);
+      if (isSuccessDelete && dataDelete?.status === 'OK') {
+        SetIsModalOpenDelete(false);
+        messageApi.success('Xóa thành công!');
+        handleCloseDrawer()
+      } else if (isErrorDelete) {
+        messageApi.error('Xóa thất bại!');
+      }
+    }, [isSuccessDelete, isErrorDelete, dataDelete, messageApi]);
+
+    useEffect(() => {
+      if (isSuccessDeleteMany && data?.status ==='ok') {
+        messageApi.success('xóa thành công!');
+        handleCloseDrawer()
+      } else if (isErrorDeleteMany) {
+        messageApi.error('xóa thất bại!');
+      }
+    }, [isSuccess, isError, messageApi]);
   // const handleOnchangeAvatar = async (uploadData) => {
   //   console.log('🔥 uploadData:', uploadData);
   //   if (!uploadData || !uploadData.fileList || !Array.isArray(uploadData.fileList) || uploadData.fileList.length === 0) {
@@ -497,7 +520,6 @@ const handleOnchangeAvatar = async (uploadData) => {
     });
     const preview = await getBase64(compressedFile);
     setStateProduct((prev) => ({ ...prev, image: preview }));
-    console.log('preview length:', preview.length);
   } catch (error) {
     console.error('Lỗi khi nén hoặc chuyển file sang base64:', error);
   }
@@ -520,7 +542,6 @@ const handleOnchangeAvatarDetails = async (uploadData) => {
     });
     const preview = await getBase64(compressedFile);
     setStateProductDetails((prev) => ({ ...prev, image: preview }));
-    console.log('preview length:', preview.length);
   } catch (error) {
     console.error('Lỗi khi nén hoặc chuyển file sang base64:', error);
   }

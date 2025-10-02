@@ -21,7 +21,6 @@ export const orderSlice = createSlice({
   initialState,
   reducers: {
     addOrderProduct: (state, action) => {
-        console.log({state , action})
         const {orderItem} = action.payload
         const itemOrder = state?.orderItems?.find((item) => item?.product === orderItem.product)
         if(itemOrder){
@@ -59,17 +58,24 @@ export const orderSlice = createSlice({
         state.orderItems = itemOrder
     },
 removeAllOrderProduct: (state, action) => {
-    const { listCheck = [] } = action.payload || {}; // ✅ đảm bảo luôn có array
+    const { listCheck = [] } = action.payload || {}; 
+
     const itemOrder = state?.orderItems?.filter(
         (item) => !listCheck.includes(item?.product)
     );
+
     const itemOrderSelected = state?.OrderItemsSelected?.filter(
         (item) => !listCheck.includes(item?.product)
     );
-    state.OrderItemsSelected = itemOrderSelected || [];
-    state.orderItems = itemOrder || [];
+
+    state.OrderItemsSelected = itemOrderSelected 
+    state.orderItems = itemOrder 
+    console.log("🎯 Final state:", {
+        orderItems: state.orderItems, 
+        OrderItemsSelected: state.OrderItemsSelected
+    });
 },
-    selectOrderItems: (state, action) => {
+selectOrderItems: (state, action) => {
             const {listCheck} = action.payload
             const orderSelected = []
             state.orderItems.forEach((order) => {
@@ -79,10 +85,13 @@ removeAllOrderProduct: (state, action) => {
         });
             state.OrderItemsSelected = orderSelected;
         },
+      SaveOrder: (state , action) => {
+        state.currentOrder = action.payload;
+      },
   },
 });
 // Export action
-export const { addOrderProduct ,increaseAmount ,decreaseAmount ,removeOrderProduct , removeAllOrderProduct , selectOrderItems , resetOrder } = orderSlice.actions;
+export const { addOrderProduct ,increaseAmount ,decreaseAmount ,removeOrderProduct , removeAllOrderProduct , selectOrderItems , resetOrder , SaveOrder } = orderSlice.actions;
 
 // Export reducer
 export default orderSlice.reducer;

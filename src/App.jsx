@@ -10,7 +10,6 @@ import { jwtDecode } from 'jwt-decode'
 import * as UserService from './service/UserService';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from './redux/slides/userSilde';
-import { error } from './components/Message/message'
 import 'antd/dist/reset.css'; // Với Antd v5
 import Loading from './components/LoadingComponent/loading'
 
@@ -18,14 +17,34 @@ function App() {
   const dispatch = useDispatch();
   const [isLoading , setIsLoading] = useState(false)
   const user = useSelector((state)  => state.user)
-  useEffect(() => {
-      setIsLoading(true)
-      const { storageData ,decoded } = handleDecoded();
-      if(decoded?.id){
-        handleGetDetailsUser(decoded?.id , storageData);
+
+    useEffect(() => {
+    const initAuth = async () => {
+      try {
+        setIsLoading(true);
+
+        // Debug token trong localStorage
+        const rawToken = localStorage.getItem("access_token");
+        console.log("=== raw access_token ===", rawToken);
+
+        const { storageData, decoded } = handleDecoded();
+        console.log("=== decoded token ===", decoded);
+        
+        if (decoded?.id) {
+          console.log('helllooo')
+           await handleGetDetailsUser(decoded.id, storageData);
+        }
+          
+      } catch (err) {
+        console.error("❌ Lỗi khi khởi tạo user:", err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false)
-  },[]);
+    };
+    initAuth();
+  }, [dispatch]); 
+
+
   const handleDecoded = () => {
     let storageData = localStorage.getItem('access_token');
     let decoded = {};
@@ -48,7 +67,7 @@ function App() {
   });
   const handleGetDetailsUser = async (id , token) => {
     const res =  await UserService.getUserDetails(id, token);
-    dispatch(updateUser({ ...res?.data, access_token: token }));
+    return res;
   }
   return (
       <div style={{ width: '100%' }}>

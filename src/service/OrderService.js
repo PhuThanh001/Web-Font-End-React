@@ -24,7 +24,6 @@ export const getOrderDetails = async (id, access_token) => {
             token: `Bearer ${access_token}`
         }
     });
-    console.log( 'data tra ve:', res.data);
     return res.data;
 }
 export const CancelOrder = async (id, access_token , orderItems) => {

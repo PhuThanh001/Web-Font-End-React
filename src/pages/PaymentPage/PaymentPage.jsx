@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Fragment, useEffect, useState } from 'react'
 import { WrapperLeft ,WrapperStyleHeader ,WrapperListOrder ,WrapperItemOrder ,WrapperPriceDiscount,WrapperInfoSection, RowInfo,WrapperTotalSection ,WrapperCountOrder ,WrapperInputNumber, WrapperInfo, WrapperTotal,WrapperRights ,WrapperRadio } from './style'
 import {DeleteOutlined  ,MinusOutlined ,PlusOutlined} from '@ant-design/icons';
-import { decreaseAmount, increaseAmount , removeOrderProduct ,removeAllOrderProduct , selectOrderItems } from '../../redux/slides/orderSlide'
+import { decreaseAmount, increaseAmount , removeOrderProduct ,removeAllOrderProduct , selectOrderItems, SaveOrder } from '../../redux/slides/orderSlide'
 import { updateUser } from '../../redux/slides/userSilde'
 import { convertPrice } from '../../utils'
 import InputComponent from '../../components/InputComponent/InputComponent'
@@ -15,13 +15,16 @@ import * as UserService  from '../../service/UserService';
 import ModalComponent from '../../components/ModalComponent/ModalComponent'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import * as OrderService from '../../service/OrderService'
+import * as VnpayService from "../../service/VnPayService";
+import { Group } from 'antd/es/radio'
 
 
 
 const PaymentPage = () => {
     const order = useSelector((state) => state.order)
     const user = useSelector((state) => state?.user)
-    const Navigate = useNavigate()
+    const Navigate = useNavigate();
+
 
     const [delivery , setDelivery] = useState('fast')
     const [payment , setPayment] = useState('later_money')
@@ -35,57 +38,16 @@ const PaymentPage = () => {
         city: '',
       })
     const handleOnChangeDetails = (e) => {
-      console.log('check' , e.target.name ,e.target.value)
       setStateUserDetails({
         ...stateUserDetails,
         [e.target.name]: e.target.value
       })
     }  
+  const handlePaymentVnpay = async () => {
+  try {
 
-    const dispatch = useDispatch()
-    // console.log('order' , order)
-    // const onChange = (e) => {
-    //     console.log(`checked = ${e.target.checked}`);
-    //     if(listCheck.includes(e.target.value)){
-    //         const newListCheck =  setListCheck(listCheck.filter(item => item !== e.target.value))
-    //         setListCheck(newListCheck)
-    //     }else {
-    //         setListCheck([...listCheck, e.target.value])
-    //     }
-    // }
-    // const handleChangeCount = (type, idProduct) => {
-    //     console.log('type' , type , 'idProduct' , idProduct)
-    //     if (type === 'increase') {
-    //         dispatch(increaseAmount({idProduct}))
-    //     }else {
-    //         dispatch(decreaseAmount({idProduct}))
-    //     }
-    // }
-    // const handleChangeCheckAll = (e) => {
-    //     if(e.target.checked) {
-    //         const newListCheck = []
-    //         order?.orderItems?.forEach((item) => {
-    //             newListCheck.push(item?.product)
-    //         });
-    //         setListCheck(newListCheck)
-    //     } else {
-    //         setListCheck([])
-    //     }
-    // }   
-    // const handleDeleteItem = (idProduct) => {
-    //         dispatch(removeOrderProduct({idProduct}))
-    // }
-    const handleChangeAddress = () => {
-        setIsModalOpenUpdate(true)
-    }
-    // const handleDeleteAllItem = () => {
-    //     if(listCheck.length === order?.orderItems?.length) {
-    //         dispatch(removeAllOrderProduct(listCheck))}
-    // }
-    const handleAddOrder = () => {
-        if(user?.access_token && order?.OrderItemsSelected && user.name && user.phone && user.address 
+      if(user?.access_token && order?.OrderItemsSelected && user.name && user.phone && user.address 
             && user.city && priceMemo && user?.id) {
-            console.log('order.OrderItemsSelected' , order?.OrderItemsSelected)
         
         mutationAddOrder.mutate({token: user?.access_token, 
             orderItems: order?.OrderItemsSelected ,fullname : user?.name ,
@@ -97,11 +59,69 @@ const PaymentPage = () => {
             totalPrice: totalPriceMemo,
             user: user?.id
           })
-          
+          const orderData = {
+              orderId: dataAdd?.order?._id,
+              totalPrice: dataAdd?.order?.totalPrice,
+              orders: order?.OrderItemsSelected,
+              totalPriceMemo: totalPriceMemo,
+              paymentMethod: payment
+          }
+          dispatch(SaveOrder(orderData))
+  }
+    const orderId = `HD_${new Date().getTime()}`;
+
+    if (!totalPriceMemo || isNaN(totalPriceMemo) || totalPriceMemo <= 0) {
+      message.error("Giá trị thanh toán không hợp lệ!");
+      return;
+    }    
+
+    const res = await VnpayService.createVnpayPayment(
+      {
+        orderId,
+        amount: totalPriceMemo,
+        orderInfo: `Thanh toán đơn hàng cho user ${user?.id}`,
+        returnUrl: "http://localhost:3001/payment/vnpay_return",
+      },
+      user?.access_token
+    );
+
+
+    if (res?.data) {
+      window.location.href = res.data;
+    } else {
+      console.error("Không có paymentUrl trong response:", res);
+      message.error("Không nhận được link thanh toán từ server!");
+    }
+  } catch (error) {
+    console.error("VNPay error:", error);
+    message.error(`Không thể khởi tạo thanh toán VNPay! Chi tiết: ${error.message || error}`);
+  } finally {
+    console.log("=== KẾT THÚC handlePaymentVnpay ===");
+  }
+};
+
+    const dispatch = useDispatch()
+    const handleChangeAddress = () => {
+        setIsModalOpenUpdate(true)
+    }
+
+    const handleAddOrder = () => {
+        if(user?.access_token && order?.OrderItemsSelected && user.name && user.phone && user.address 
+            && user.city && priceMemo && user?.id) {
+        
+        mutationAddOrder.mutate({token: user?.access_token, 
+            orderItems: order?.OrderItemsSelected ,fullname : user?.name ,
+            phone: user?.phone, address: user?.address, city: user?.city, 
+            paymentMethod : payment,
+            itemsPrice: priceMemo,
+            shippingPrice: deliveryPriceMemo,
+            userId: user?.id,
+            totalPrice: totalPriceMemo,
+            user: user?.id
+          })
   }
 }
 const mutationUpdate = useMutationHook(async (data) => {
-    console.log('data' , data)
     const {
       id ,
       token,
@@ -114,8 +134,6 @@ const mutationUpdate = useMutationHook(async (data) => {
   },
 )
   const mutationAddOrder  = useMutationHook(async (data) => {
-    console.log('data' , data)
-    console.log('mua hang' , user?.access_token)
     const {
       token,
       ...rests
@@ -125,6 +143,7 @@ const mutationUpdate = useMutationHook(async (data) => {
     return res
   },
 )
+//localhost:5173/OrderPageSuccess
     const handleCancelUpdate = () => {
         setStateUserDetails({
             name: '',
@@ -143,6 +162,13 @@ const mutationUpdate = useMutationHook(async (data) => {
                         {
                             onSuccess: () => {
                                 dispatch(updateUser({name, phone, address, city}))
+                                localStorage.setItem("user", JSON.stringify({
+                                  ...user,
+                                  name,
+                                  phone,
+                                  address,
+                                  city
+                                }));
                                 setIsModalOpenUpdate(false)
                             }
                         }
@@ -151,35 +177,71 @@ const mutationUpdate = useMutationHook(async (data) => {
     }
     const {isLoading, data} = mutationUpdate
     const {data: dataAdd , isLoading: isLoadingAddOrder, isSuccess , isError} = mutationAddOrder
+
+
 useEffect(() => {
-  console.log("DEBUG 👉 mutationAddOrder:", mutationAddOrder)
 }, [mutationAddOrder])
     useEffect(() => {
         form.setFieldsValue(stateUserDetails)
     }, [form, stateUserDetails])
+    // useEffect(() => {
+    //     if(isSuccess && dataAdd?.status === 'OK') {
+    //         const orderData = {
+    //           orderId: dataAdd?.order?._id,
+    //           totalPrice: dataAdd?.order?.totalPrice,
+    //           orders: order?.OrderItemsSelected,
+    //           totalPriceMemo: totalPriceMemo,
+    //           paymentMethod: payment
+    //       }
+    //       dispatch(SaveOrder(orderData))
+    //       const arrayOrdered = []
+    //       order?.OrderItemsSelected.forEach(element => {
+    //         arrayOrdered.push(element.product)
+    //       });
+    //       message.success('Đặt hàng thành công')
+    //       dispatch(removeAllOrderProduct({listChecked : arrayOrdered}))
+    //       message.success('đặt hàng thành công')
+    //       Navigate('/OrderPageSuccess' ,{
+    //         state: {
+    //           orderId: dataAdd?.order?._id,
+    //           totalPrice: dataAdd?.order?.totalPrice,
+    //           orders: order?.OrderItemsSelected,
+    //           totalPriceMemo: totalPriceMemo,
+    //           paymentMethod: payment
+    //         }
+    //       })
+    //   }else if(isError) {
+    //       message.error('Đặt hàng thất bại')
+    //     }
+    // }, [isSuccess, isError])
     useEffect(() => {
-        console.log("DEBUG 👉 isSuccess:", isSuccess, "dataAdd:", dataAdd)
-        if(isSuccess && dataAdd?.status === 'OK') {
-          const arrayOrdered = []
-          order?.OrderItemsSelected.forEach(element => {
-            arrayOrdered.push(element.product)
-          });
-          message.success('Đặt hàng thành công')
-          dispatch(removeAllOrderProduct({listChecked : arrayOrdered}))
-          message.success('đặt hàng thành công')
-          console.log('ordrItemSelected' , order.OrderItemsSelected)
-          Navigate('/OrderPageSuccess' ,{
-            state: {
-              orderId: dataAdd?.order?._id,
-              totalPrice: dataAdd?.order?.totalPrice,
-              orders: order?.OrderItemsSelected,
-              totalPriceMemo: totalPriceMemo
-            }
-          })
-      }else if(isError) {
-          message.error('Đặt hàng thất bại')
-        }
-    }, [isSuccess, isError])
+  if (isSuccess && dataAdd?.status === 'OK') {
+    const orderData = {
+      orderId: dataAdd?.order?._id,
+      totalPrice: dataAdd?.order?.totalPrice,
+      orders: order?.OrderItemsSelected,
+      totalPriceMemo: totalPriceMemo,
+      paymentMethod: payment,
+    };
+
+    // ✅ Lưu order vào Redux
+    dispatch(SaveOrder(orderData));
+
+    const arrayOrdered = [];
+    order?.OrderItemsSelected.forEach((element) => {
+      arrayOrdered.push(element.product);
+    });
+
+    message.success('Đặt hàng thành công');
+    dispatch(removeAllOrderProduct({ listChecked: arrayOrdered }));
+
+    // Chuyển trang mà không cần truyền state nữa
+    Navigate('/OrderPageSuccess');
+  } else if (isError) {
+    message.error('Đặt hàng thất bại');
+  }
+}, [isSuccess, isError]);
+
   
     useEffect(() => {
         if(setIsModalOpenUpdate) {
@@ -228,7 +290,6 @@ const totalPriceMemo = useMemo(() => {
   };
 
 const handlePayment = (e) => {
-    console.log('e.target.value' , e.target.value)
     setPayment(e.target.value);
 }
 
@@ -257,13 +318,17 @@ const handlePayment = (e) => {
                     <WrapperInfo>
                         <div>
                             <label>Chọn Phương Thức Thanh Toán</label>
-                            <WrapperRadio onChange={handlePayment} value={payment}>
+                          <Radio.Group style={{
+                                    display: 'flex',
+                                    flexDirection: 'column'
+                                }}
+                           onChange={handlePayment} value={payment}>
                                 <Radio value="later_money">Thanh Toán Sau Khi Nhận Được Hàng</Radio>
-                            </WrapperRadio>
+                                <Radio value="vnpay">Thanh Toán bằng VNPay</Radio>
+                          </Radio.Group>
                         </div>
                     </WrapperInfo>
                 </WrapperLeft>
-                {console.log('order' , order?.price)}
                 <WrapperRights>
                         <WrapperInfo>
                             <div>
@@ -274,44 +339,72 @@ const handlePayment = (e) => {
                         </WrapperInfo>
                     <div style={{width : '100%'}}>
                         <WrapperInfoSection>
-                            <RowInfo  style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <RowInfo  style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '20px'}}>
                                 <span>Tạm tính</span>
                                 <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(priceMemo)}</span>
                             </RowInfo>
-                                <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                                <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '20px'}}>
                                 <span>Giảm giá</span>
                                 <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(discountMemo)}</span>
                             </RowInfo>
-                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '20px'}}>
                                 <span>Thuế</span>
                                 <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>0</span>
                             </RowInfo>
-                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <RowInfo style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between' , gap: '20px'}}>
                                 <span>Phí Giao Hàng</span>
                                 <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(deliveryPriceMemo)}</span>
                             </RowInfo>
                         </WrapperInfoSection>
                         <WrapperTotalSection>
-                            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between'}}>
+                            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'space-between', gap: '20px'}}>
                                 <span>Tổng cộng</span>
-                                <span style={{color: '#000' ,fontSize: '14px' , fontWeight: 'bold'}}>{convertPrice(totalPriceMemo)}</span>
+                                <span style={{color: 'rgba(245, 35, 7, 1)' ,fontSize: '14px' , fontWeight: 'bold', display : 'flex' }}>{convertPrice(totalPriceMemo)}</span>
                             </div>
                         </WrapperTotalSection>
                     </div>
-                                <ButtonComponent
+                      {payment === "later_money" ? (
+                        <ButtonComponent
                                         border = {false}
                                         size = {40} 
                                         styleButton ={{
-                                                backgroundColor : 'rgb(224, 1, 16)' ,
+                                                backgroundColor : 'rgba(245, 35, 7, 1)' ,
                                                 height : '48px' ,
                                                 width : '228PX' ,
                                                 border : 'none' ,
-                                                borderRadius : '4px'
+                                                borderRadius : '4px',
+                                                marginTop: '20px'
                                          }}
-                                         textButton ={ 'Chọn mua'}
+                                         textButton ={ 'Đặt Hàng'}
                                          styleTextButton = {{ color : '#efefef' , fontSize : '15px', fontWeight : '700'}}
-                                         onClick={handleAddOrder}  >
-                                </ButtonComponent>
+                                         onClick={handleAddOrder}  />
+                                          ):(
+                                            <div></div>
+                                          ) }
+                                {/* ✅ Nút thanh toán VNPay */}
+                                {payment === "vnpay" ? (              
+                <ButtonComponent
+                border={false}
+                size={40}
+                styleButton={{
+                  backgroundColor: "#0d6efd",
+                  height: "48px",
+                  width: "228PX",
+                  border: "none",
+                  borderRadius: "4px",
+                  marginTop: "10px",
+                }}
+                textButton={"Thanh toán VNPay"}
+                styleTextButton={{
+                  color: "#fff",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                }}
+                onClick={handlePaymentVnpay}
+              />) : (
+                                <div></div>
+                            )}
+
                 </WrapperRights>
             </div>
         </div>

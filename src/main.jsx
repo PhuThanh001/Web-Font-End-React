@@ -3,11 +3,10 @@ import './index.css'
 import App from './App.jsx'
 import React from "react";
 import ReactDOM from "react-dom/client";
-import './index.css';
-import 'antd/dist/reset.css'; // Với Antd v5
+import './index.css';import "antd/dist/reset.css"; // với AntD v5
+
 import { PersistGate } from 'redux-persist/lib/integration/react.js';
 
-//import 'antd/dist/antd.min.css';
 import reportWebVitals from './reportWebVitals.js' ;
 import {Provider} from 'react-redux';
 import { persistor , store  } from './redux/store.js';

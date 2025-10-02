@@ -1,7 +1,15 @@
 import React from 'react'
 import {Button} from 'antd'
 
-const ButtonComponent = ({size , styleButton , styleTextButton , TextButton, disabled , ...rests}) => {
+const ButtonComponent = ({ 
+  size, 
+  styleButton, 
+  styleTextButton, 
+  textButton,   // ✅ dùng chữ t thường
+  disabled, 
+  ...rests 
+}) => {
+
   return (
     <Button
       disabled={disabled}
@@ -12,8 +20,10 @@ const ButtonComponent = ({size , styleButton , styleTextButton , TextButton, dis
       }}
       {...rests}
     >
-      <span style={styleTextButton}>{TextButton}</span>
+      <span style={styleTextButton}>{textButton}</span>
     </Button>
   )
-} 
+}
+
+
 export default ButtonComponent
