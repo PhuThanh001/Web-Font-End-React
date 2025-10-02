@@ -80,7 +80,7 @@ const PaymentPage = () => {
         orderId,
         amount: totalPriceMemo,
         orderInfo: `Thanh toán đơn hàng cho user ${user?.id}`,
-        returnUrl: "http://localhost:3001/payment/vnpay_return",
+        returnUrl: "https://backend-ecomerce-0c91.onrender.com/payment/vnpay_return",
       },
       user?.access_token
     );
