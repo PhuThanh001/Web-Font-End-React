@@ -575,22 +575,25 @@ const typeList = TypeProduct?.data?.data?.data || [];
       <Loading isPending={isPending}>
         <Form
           name="name"
-          labelCol={{ span: 2 }}
-          wrapperCol={{ span: 22 }}
-          style={{ maxWidth: 600 }}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          style={{ maxWidth: 400 }}
           onFinish={onFinish}
           autoComplete="on"
-          //form={form}
         >
           <Form.Item
-            label="Name"
+            label="Name :"
             name="name"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <InputComponent value={stateProduct.name} onChange={handleOnChange} name="name" />
+          <InputComponent 
+            value={stateProduct.name} 
+            onChange={handleOnChange} 
+            name="name" 
+            />
           </Form.Item>
           <Form.Item
-            label="Type"
+            label="Type :"
             name="type"
             rules={[{ required: true, message: 'Please input your Typiuiuiuiuiu!' }]}
             >

@@ -18,6 +18,7 @@ export const WrapperTextHeader = styled.span`
 export const WrapperHeaderAccount = styled.div`
     display : flex;
     align-items : center;
+    margin-left: 12px;
     color : #fff;
     gap : 10px ;
 `

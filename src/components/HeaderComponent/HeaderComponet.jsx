@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Badge, Col, Row, Popover } from 'antd';
+import { Popover, Avatar ,Badge, Col, Row  } from 'antd';
 import { WrapperHeader, WrapperHeaderAccount, WrapperTextHeader, WrapperTextHeaderSmall, WrapperIconHeader, WrapperContentPopUp } from './Style';
 import Search from 'antd/es/transfer/search';
 import { UserOutlined, CaretDownOutlined, ShoppingCartOutlined } from '@ant-design/icons';
@@ -21,6 +21,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
   const user = useSelector((state) => state.user, shallowEqual);
   const [search, setSearch] = useState('');
   const order = useSelector((state) => state.order);
+
   console.log("user" , user)
 
   const handleLogout = async () => {
@@ -32,11 +33,12 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
 
 useEffect(() => {
   const fetchProfile = async () => {
+    console.log('user.accesss' , user?.access_token)
     if (user?.access_token) {
       try {
-        const res = await UserService.getUserDetails(user._id, user.access_token);
+        const res = await UserService.getUserDetails(user.id, user.access_token);
+        console.log('res' , res)
         const profile = res?.data;
-
         if (profile) {
           dispatch(updateUser({
             ...user,
@@ -50,6 +52,7 @@ useEffect(() => {
   };  
 fetchProfile();
 }, [user?.access_token]);
+
 useEffect(() => {
   setIsLoading(true);
   setUserName(user?.name);
@@ -131,7 +134,7 @@ const content = (
             )}
             <Col span={6} style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
               <Loading isPending={isLoading}>
-                <WrapperHeaderAccount>
+                <WrapperHeaderAccount className='fafadfadf'>
                   {userAvatar ? (
                     <img
                       src={userAvatar}
