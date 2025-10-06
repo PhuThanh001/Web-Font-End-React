@@ -50,11 +50,18 @@ function App() {
   //     }
   //     return { storageData, decoded };
   // }
-  const handleDecoded = () => {
-  const storageData = localStorage.getItem("access_token");
+const handleDecoded = () => {
+  let storageData = localStorage.getItem('access_token');
   let decoded = {};
 
-  if (storageData && storageData !== "undefined" && storageData !== "null") {
+  // ✅ Chặn các giá trị không hợp lệ
+  if (
+    storageData &&
+    storageData !== "undefined" &&
+    storageData !== "null" &&
+    isjsonstring(storageData)
+  ) {
+    storageData = JSON.parse(storageData);
     decoded = jwtDecode(storageData);
   }
 
