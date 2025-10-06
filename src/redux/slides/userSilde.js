@@ -2,20 +2,55 @@ import { createSlice } from '@reduxjs/toolkit'
 import { Avatar } from 'antd';
 
 
+let savedUser = localStorage.getItem('user');
+let initialState = {};
 
-
-const initialState = JSON.parse(localStorage.getItem('user')) || {
-  email: '',
-  name: '',
-  access_token: '',
-  address: '',
-  city : '' ,
-  avatar: '',
-  id: '',
-  isLoading: true,
-  isSuccess:true,
-  isAdmin:true
+try {
+  
+  if (savedUser && savedUser !== 'undefined' && savedUser !== 'null') {
+    initialState = JSON.parse(savedUser);
+  } else {
+    initialState = {
+      email: '',
+      name: '',
+      access_token: '',
+      address: '',
+      city: '',
+      avatar: '',
+      id: '',
+      isLoading: true,
+      isSuccess: true,
+      isAdmin: false // 
+    };
+  }
+} catch (e) {
+  console.warn("⚠️ Lỗi parse user từ localStorage:", e);
+  initialState = {
+    email: '',
+    name: '',
+    access_token: '',
+    address: '',
+    city: '',
+    avatar: '',
+    id: '',
+    isLoading: true,
+    isSuccess: true,
+    isAdmin: false
+  };
 }
+
+// const initialState = JSON.parse(localStorage.getItem('user')) || {
+//   email: '',
+//   name: '',
+//   access_token: '',
+//   address: '',
+//   city : '' ,
+//   avatar: '',
+//   id: '',
+//   isLoading: true,
+//   isSuccess:true,
+//   isAdmin:true
+// }
 export const userSlice = createSlice({
   name: 'user',
   initialState,
