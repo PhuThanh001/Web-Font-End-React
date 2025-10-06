@@ -32,8 +32,6 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
   };
 useEffect(() => {
   const fetchProfile = async () => {
-    console.log('user.access_token:', user?.access_token);
-    console.log('user._id:', user?._id); // Giữ log để debug
     if (user?.access_token && user?._id) { // ✅ Thêm check _id tồn tại
       try {
         const res = await UserService.getUserDetails(user._id, user.access_token);
@@ -99,9 +97,11 @@ const content = (
         Quản lí hệ thống
       </WrapperContentPopUp>
     )}
-    <WrapperContentPopUp onClick={() => handlerClickNavigation(`my-order`) }>
-      Đơn Hàng Của Tôi
-    </WrapperContentPopUp>
+    {!user?.isAdmin && (
+      <WrapperContentPopUp onClick={() => handlerClickNavigation(`my-order`) }>
+        Đơn Hàng Của Tôi
+      </WrapperContentPopUp>
+    )}
     <WrapperContentPopUp onClick={handleLogout}>
       Đăng Xuất
     </WrapperContentPopUp>
@@ -140,10 +140,10 @@ const content = (
           <Row align="middle">
             <Col span={6}>
               <WrapperTextHeader
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer' , marginLeft: '20px' }}
                 onClick={() => navigate('/')}
               >
-                Laptrinhquade
+                Nest-shop
               </WrapperTextHeader>
             </Col>
             {!isHiddenSearch && (
@@ -204,14 +204,14 @@ const content = (
                   )}
                 </WrapperHeaderAccount>
               </Loading>
-              {!isHiddentCart && (
-                <div>
-                  <div onClick={() => navigate('/order')} style={{ cursor: 'pointer' }}>
-                    <Badge size="small" count={order?.orderItems?.length}></Badge>
-                    <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
-                    <WrapperTextHeaderSmall>giỏ hàng</WrapperTextHeaderSmall>
-                  </div>
+            {!isHiddentCart && !user?.isAdmin && (
+              <div>
+                <div onClick={() => navigate('/order')} style={{ cursor: 'pointer' }}>
+                  <Badge size="small" count={order?.orderItems?.length}></Badge>
+                  <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
+                  <WrapperTextHeaderSmall>giỏ hàng</WrapperTextHeaderSmall>
                 </div>
+              </div>
               )}
             </Col>
           </Row>

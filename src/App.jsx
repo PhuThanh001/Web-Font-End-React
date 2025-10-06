@@ -41,15 +41,25 @@ function App() {
   }, [dispatch]); 
 
 
+  // const handleDecoded = () => {
+  //   let storageData = localStorage.getItem('access_token');
+  //   let decoded = {};
+  //     if (storageData && isjsonstring(storageData)) {
+  //       storageData = JSON.parse(storageData);
+  //       decoded = jwtDecode(storageData);
+  //     }
+  //     return { storageData, decoded };
+  // }
   const handleDecoded = () => {
-    let storageData = localStorage.getItem('access_token');
-    let decoded = {};
-      if (storageData && isjsonstring(storageData)) {
-        storageData = JSON.parse(storageData);
-        decoded = jwtDecode(storageData);
-      }
-      return { storageData, decoded };
+  const storageData = localStorage.getItem("access_token");
+  let decoded = {};
+
+  if (storageData && storageData !== "undefined" && storageData !== "null") {
+    decoded = jwtDecode(storageData);
   }
+
+  return { storageData, decoded };
+};
   UserService.axiosJWT.interceptors.request.use(async (config) => {
     const CurrentTime = new Date();
     const { decoded } = handleDecoded();
