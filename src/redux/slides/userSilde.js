@@ -29,8 +29,11 @@ updateUser: (state, action) => {
     address = '',
     avatar = '',
     phone = '',
-    _id = '',
-    isAdmin = true
+    // _id = '',
+    _id = state.id,
+    //isAdmin = true
+    isAdmin = false
+
   } = action.payload;
 
   state.name = name || email;
