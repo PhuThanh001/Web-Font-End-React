@@ -39,8 +39,15 @@ const SignInPage = () => {
       }else{
         navigate('/');
       }
-      localStorage.setItem('access_token', JSON.stringify(data?.access_token));
-      localStorage.setItem('user', JSON.stringify(data?.data));
+      // localStorage.setItem('access_token', JSON.stringify(data?.access_token));
+      // localStorage.setItem('user', JSON.stringify(data?.data));
+      localStorage.removeItem('user');
+      localStorage.removeItem('access_token'); 
+
+      localStorage.setItem('access_token', data?.access_token || '');
+
+      // Set user từ login res (sẽ override sau nếu fetch details)
+      localStorage.setItem('user', JSON.stringify(data?.data || {}));
       if (data?.access_token) {
         const decodedToken = jwtDecode(data?.access_token);
         if(decodedToken?.id){

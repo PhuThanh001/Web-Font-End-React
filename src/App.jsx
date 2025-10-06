@@ -1,15 +1,14 @@
 import {BrowserRouter as Router,Routes,Route } from 'react-router-dom'
-import HeaderComponent from './components/HeaderComponent/HeaderComponet'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import { routes } from './routes'
 import { Fragment, useEffect, useState } from 'react'
 import LayoutWithHeader from './components/Layout/LayoutWithHeader'; // <-- dùng layout mới
 import axios from 'axios';
+import { updateUser } from './redux/slides/userSilde'
 import  {isjsonstring}  from './utils';
 import { jwtDecode } from 'jwt-decode'
 import * as UserService from './service/UserService';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser } from './redux/slides/userSilde';
 import 'antd/dist/reset.css'; // Với Antd v5
 import Loading from './components/LoadingComponent/loading'
 
@@ -22,16 +21,13 @@ function App() {
     const initAuth = async () => {
       try {
         setIsLoading(true);
-
         // Debug token trong localStorage
         const rawToken = localStorage.getItem("access_token");
         console.log("=== raw access_token ===", rawToken);
 
         const { storageData, decoded } = handleDecoded();
         console.log("=== decoded token ===", decoded);
-        
         if (decoded?.id) {
-          console.log('helllooo')
            await handleGetDetailsUser(decoded.id, storageData);
         }
           
@@ -67,6 +63,7 @@ function App() {
   });
   const handleGetDetailsUser = async (id , token) => {
     const res =  await UserService.getUserDetails(id, token);
+    dispatch(updateUser(res.data));
     return res;
   }
   return (

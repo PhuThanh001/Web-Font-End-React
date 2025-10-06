@@ -30,28 +30,57 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddentCart = false }) => {
     dispatch(resetUser());
     setIsLoading(false);
   };
-
 useEffect(() => {
   const fetchProfile = async () => {
-    console.log('user.accesss' , user?.access_token)
-    if (user?.access_token) {
+    console.log('user.access_token:', user?.access_token);
+    console.log('user._id:', user?._id); // Giữ log để debug
+    if (user?.access_token && user?._id) { // ✅ Thêm check _id tồn tại
       try {
-        const res = await UserService.getUserDetails(user.id, user.access_token);
-        console.log('res' , res)
-        const profile = res?.data;
-        if (profile) {
+        const res = await UserService.getUserDetails(user._id, user.access_token);
+        console.log('res', res);
+        const profile = res?.data.data; // Giả sử API wrap { data: { ... } }
+        console.log("profile", profile);
+        if (profile && profile._id === user._id) { // ✅ Check ID match để tránh update sai
           dispatch(updateUser({
-            ...user,
-            ...profile    // giả sử API trả về name, email, avatar, ...
+            ...profile,  // ✅ Spread profile TRƯỚC user để override đúng (không giữ cũ)
+            access_token: user.access_token  // Override token từ state hiện tại
           }));
         }
       } catch (error) {
-        console.log("Error fetchProfile: ", error);
+        console.error("Error fetchProfile:", error); // Dùng error để có stack trace
+        if (error.response?.status === 401) {
+          dispatch(resetUser()); // Clear nếu token invalid
+        }
       }
+    } else {
+      console.log('Skip fetch: Missing token or _id');
     }
   };  
-fetchProfile();
-}, [user?.access_token]);
+  fetchProfile();
+}, [user?.access_token, user?._id]); // ✅ Thêm _id vào dep để re-fetch nếu ID thay đổi (nhưng check tránh loop)
+// useEffect(() => {
+//   const fetchProfile = async () => {
+//     console.log('user.accesss' , user?.access_token)
+//     console.log('user.id:', user?._id);
+//     if (user?.access_token) {
+//       try {
+//         const res = await UserService.getUserDetails(user._id, user.access_token);
+//         console.log('res' , res)
+//         const profile = res?.data.data;
+//         console.log("profile" , profile) 
+//         if (profile) {
+//           dispatch(updateUser({
+//             ...user,
+//             ...profile    // giả sử API trả về name, email, avatar, ...
+//           }));
+//         }
+//       } catch (error) {
+//         console.log("Error fetchProfile: ", error);
+//       }
+//     }
+//   };  
+// fetchProfile();
+// }, [user?.access_token]);
 
 useEffect(() => {
   setIsLoading(true);

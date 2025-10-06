@@ -32,8 +32,7 @@ const ProfilePage = () => {
 
   const { data, isPending, isSuccess, isError } = mutation;
 
-  console.log('mutation', mutation);
-  console.log('isSuccess:', isSuccess, 'isError:', isError);
+
 
   // Cập nhật state từ user
   useEffect(() => {
@@ -46,11 +45,8 @@ const ProfilePage = () => {
 
   // Xử lý thông báo và cập nhật user details
   useEffect(() => {
-    console.log('isSuccess:', isSuccess, 'isError:', isError);
     if (isSuccess) {
-      console.log('Trước khi gọi messageApi.success');
       messageApi.success('Cập nhật thành công!');
-      console.log('Sau khi gọi messageApi.success');
       setTimeout(() => {
         try {
           if (!user?.id || !user?.access_token) {
@@ -72,7 +68,15 @@ const ProfilePage = () => {
   const handleDetailsUser = async (id, token) => {
     try {
       const res = await UserService.getUserDetails(id, token);
-      dispatch(updateUser({ ...res?.data, access_token: token }));
+      const profile = res?.data;
+      if (profile && profile._id) { 
+      dispatch(updateUser({ 
+        ...profile,  
+        access_token: token  
+      }));
+    } else {
+      console.error('Invalid profile data from API');
+    }
     } catch (error) {
       console.error('Lỗi khi lấy chi tiết user:', error);
     }
@@ -95,17 +99,14 @@ const ProfilePage = () => {
   };
 
   const handleOnchangeAvatar = async (uploadData) => {
-    console.log('🔥 uploadData:', uploadData);
     if (!uploadData || !uploadData.fileList || !Array.isArray(uploadData.fileList) || uploadData.fileList.length === 0) {
       console.log('⚠️ fileList không hợp lệ hoặc rỗng');
       return;
     }
 
     const file = uploadData.fileList[0];
-    console.log('📁 file:', file);
 
     if (!file.url && !file.preview) {
-      console.log('🔄 Chưa có url/preview, bắt đầu đọc file...');
       try {
         file.preview = await getBase64(file.originFileObj);
         console.log('✅ file.preview:', file.preview);
@@ -119,7 +120,6 @@ const ProfilePage = () => {
   };
 
   const handleUpdate = () => {
-    console.log('Avatar đang gửi đi:', avatar);
     if (!user?.id || !user?.access_token) {
       messageApi.error('Không thể cập nhật: Thiếu user id hoặc token');
       return;
