@@ -68,7 +68,7 @@ const ProfilePage = () => {
   const handleDetailsUser = async (id, token) => {
     try {
       const res = await UserService.getUserDetails(id, token);
-      const profile = res?.data;
+      const profile = res?.data?.data;
       if (profile && profile._id) { 
       dispatch(updateUser({ 
         ...profile,  
