@@ -31,7 +31,7 @@ export const GetProductType = async (type, page, limit) => {
     return res.data;
 };
 export const CreateProduct  = async (data) => {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/product/create'`, data);
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/product/create`, data);
     return res.data;
 }
 export const GetDetailsProduct  = async (id) => {
