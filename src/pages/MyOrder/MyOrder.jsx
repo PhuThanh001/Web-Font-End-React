@@ -93,7 +93,7 @@ const MyOrder = () => {
                                 <span style={{color: 'rgb(255,66,78)' }}> Giao Hàng </span> {`${order.isDelivered ? 'Đã Giao Hàng' : 'Chưa Giao Hàng'}`}
                             </div>
                             <div>
-                                <span style={{color: 'rgb(255,66,78)' }}> Thanh Toán</span> {`${order.isPaid ? 'Đã Giao Hàng' : 'Chưa Thanh Toán'}`}
+                                <span style={{color: 'rgb(255,66,78)' }}> Thanh Toán</span> {`${order.isPaid ? 'Đã Thanh Toán' : 'Chưa Thanh Toán'}`}
                             </div>
                         </WrapperStatus>
                         {renderProduct(order?.orderItems)}

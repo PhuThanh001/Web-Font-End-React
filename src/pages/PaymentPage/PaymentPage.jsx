@@ -57,7 +57,8 @@ const PaymentPage = () => {
             shippingPrice: deliveryPriceMemo,
             userId: user?.id,
             totalPrice: totalPriceMemo,
-            user: user?.id
+            user: user?.id,
+            isPaid: true
           })
           const orderData = {
               orderId: dataAdd?.order?._id,
@@ -80,7 +81,8 @@ const PaymentPage = () => {
         orderId,
         amount: totalPriceMemo,
         orderInfo: `Thanh toán đơn hàng cho user ${user?.id}`,
-        returnUrl: "https://backend-ecomerce-0c91.onrender.com/payment/vnpay_return",
+        returnUrl: "http://localhost:3001/payment/vnpay_return",
+        // returnUrl: "https://backend-ecomerce-0c91.onrender.com/payment/vnpay_return",
       },
       user?.access_token
     );
@@ -138,6 +140,7 @@ const mutationUpdate = useMutationHook(async (data) => {
       token,
       ...rests
     } = data
+    console.log("DATA" ,data)
     const res = await OrderService.CreateOrder(
       {...rests}, token)
     return res
